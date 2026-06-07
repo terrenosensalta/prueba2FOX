@@ -1026,11 +1026,14 @@ Indica si hay zonas prohibidas (aeropuertos cercanos, prisiones, militares), el 
             dlAnchorElem.click();
         });
 
-        // --- 17. SINCRONIZACIÓN GOOGLE SHEETS (MOCK/FETCH) ---
-        document.getElementById('btn-sync-sheets').addEventListener('click', async () => {
-            const url = document.getElementById('sheets-url').value;
-            if(!url || !url.includes('script.google.com')) return showCustomModal('error', 'URL Inválida', 'Ingrese una URL de Google Apps Script válida.');
-            if(flights.length === 0) return showCustomModal('info', 'Archivo Vacío', 'No hay registros locales para sincronizar.');
+        // --- 17. SINCRONIZACIÓN GOOGLE SHEETS (MEJORADA) ---
+        async function syncToGoogleSheets() {
+            const url = document.getElementById('sheets-url').value.trim();
+            
+            // Validaciones previas
+            if(!url) return showCustomModal('error', 'URL Requerida', 'Configura la URL de tu Google Apps Script en el encabezado.');
+            if(!url.includes('script.google.com')) return showCustomModal('error', 'URL Inválida', 'La URL debe ser de Google Apps Script (script.google.com).');
+            if(flights.length === 0) return showCustomModal('info', 'Sin Registros', 'No hay registros locales para enviar.');
 
             const btn = document.getElementById('btn-sync-sheets');
             const originalHTML = btn.innerHTML;
@@ -1038,29 +1041,179 @@ Indica si hay zonas prohibidas (aeropuertos cercanos, prisiones, militares), el 
             btn.disabled = true;
 
             try {
-                // Al enviar a Google Apps Script Web App a menudo se requieren configs de CORS específicas.
-                // Aquí usamos 'no-cors' como fallback estándar asumiendo que el script maneja POST correctamente.
-                // En un entorno de producción, la validación final depende del Apps Script (.gs)
-                
-                // Reducimos peso removiendo base64
-                const payload = flights.map(f => { const {image, ...r} = f; return r; });
+                // Preparar payload: remover imágenes base64 grandes + limitar tamaño
+                const payload = flights.map(f => {
+                    const flightCopy = {...f};
+                    
+                    // Si tiene imagen base64 muy grande, truncarla o reemplazarla
+                    if(flightCopy.image && flightCopy.image.startsWith('data:')) {
+                        if(flightCopy.image.length > 50000) {
+                            flightCopy.image = '[Imagen adjunta localmente - demasiado grande para Sheets]';
+                        }
+                        // Opcionalmente, reemplazar todas las imágenes por un placeholder
+                        // flightCopy.image = '[Imagen disponible localmente]';
+                    }
+                    return flightCopy;
+                });
 
-                await fetch(url, {
+                console.log(`Enviando ${flights.length} registros a Google Sheets...`);
+                
+                // Fetch SIN mode: 'no-cors' para poder leer la respuesta correctamente
+                const response = await fetch(url, {
                     method: 'POST',
-                    mode: 'no-cors', 
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify(payload)
                 });
 
-                showCustomModal('success', 'Sincronización Enviada', 'Los datos se enviaron a la hoja de cálculo. (Nota: por políticas de CORS, el estado final depende del script de Google).');
-            } catch (err) {
-                console.error(err);
-                showCustomModal('error', 'Fallo de Red', 'No se pudo conectar con el servidor de Google Sheets.');
+                if(!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                // Intentar leer respuesta (puede ser JSON o texto)
+                let responseData;
+                const contentType = response.headers.get('content-type');
+                if(contentType && contentType.includes('application/json')) {
+                    responseData = await response.json();
+                } else {
+                    responseData = await response.text();
+                }
+
+                console.log('Respuesta de Google Sheets:', responseData);
+                
+                showCustomModal('success', '✅ Sincronización Exitosa', 
+                    `Se enviaron ${flights.length} registros a Google Sheets correctamente.\n\n` +
+                    `Datos recibidos por el servidor: ${typeof responseData === 'object' ? JSON.stringify(responseData) : responseData}`
+                );
+
+            } catch(error) {
+                console.error('Error en sincronización:', error);
+                
+                let errorMsg = 'Error desconocido al sincronizar.';
+                if(error.message.includes('Failed to fetch')) {
+                    errorMsg = 'Error de red. Verifica:\n• Conexión a Internet\n• URL correcta de Google Apps Script\n• Que el script esté públicamente accesible';
+                } else if(error.message.includes('HTTP 404')) {
+                    errorMsg = 'URL no encontrada (404). Verifica que el Google Apps Script esté correctamente desplegado.';
+                } else if(error.message.includes('HTTP 403')) {
+                    errorMsg = 'Acceso denegado (403). En Google Apps Script:\n1. Ve a Deployment > Manage deployments\n2. Edita el deployment\n3. Asegúrate de que "Execute as" sea TU usuario\n4. "Who has access" sea "Anyone"';
+                } else {
+                    errorMsg = error.message;
+                }
+                
+                showCustomModal('error', '❌ Fallo en Sincronización', errorMsg);
             } finally {
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
             }
+        }
+
+        // Evento del botón sincronizar con opciones
+        document.getElementById('btn-sync-sheets').addEventListener('click', async () => {
+            const url = document.getElementById('sheets-url').value.trim();
+            if(!url) return showCustomModal('error', 'URL Requerida', 'Configura la URL de Google Apps Script primero.');
+            
+            // Mostrar opciones: Enviar, Recibir o Ambos
+            showCustomModal('info', 'Opciones de Sincronización', 
+                'Elige una acción:', 
+                (confirmed) => { if(!confirmed) return; }
+            );
+            
+            // Reemplazar los botones del modal por opciones personalizadas
+            const btnsDiv = document.getElementById('alert-buttons');
+            btnsDiv.innerHTML = `
+                <button class="bg-navy-800 hover:bg-navy-700 border border-navy-700 text-slate-200 font-bold py-2 px-3 rounded-lg transition-all text-xs" onclick="document.getElementById('custom-alert-modal').classList.add('hidden')">
+                    Cancelar
+                </button>
+                <button class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 px-3 rounded-lg transition-all text-xs flex items-center gap-1.5" onclick="loadFromGoogleSheets(); document.getElementById('custom-alert-modal').classList.add('hidden')">
+                    <i class="fa-solid fa-cloud-arrow-down"></i> Cargar desde Nube
+                </button>
+                <button class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-3 rounded-lg transition-all text-xs flex items-center gap-1.5" onclick="syncToGoogleSheets(); document.getElementById('custom-alert-modal').classList.add('hidden')">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Enviar a Nube
+                </button>
+            `;
         });
+
+        // Función para cargar datos DESDE Google Sheets
+        async function loadFromGoogleSheets() {
+            const url = document.getElementById('sheets-url').value.trim();
+            if(!url) return showCustomModal('error', 'URL Requerida', 'Configura la URL de Google Apps Script primero.');
+
+            const btn = document.getElementById('btn-sync-sheets');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cargando...';
+            btn.disabled = true;
+
+            try {
+                console.log('Solicitando datos desde Google Sheets...');
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if(!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('Datos recibidos:', data);
+
+                // Validar que sea un array
+                if(!Array.isArray(data)) {
+                    throw new Error('El servidor no devolvió un array válido de registros.');
+                }
+
+                if(data.length === 0) {
+                    showCustomModal('info', 'Google Sheets Vacío', 'No hay registros en la hoja de cálculo. Los datos locales se mantienen.');
+                    return;
+                }
+
+                // Validar que tengan campos necesarios
+                const validFlights = data.filter(f => f.id && f.opName);
+                if(validFlights.length === 0) {
+                    throw new Error('Los registros no tienen la estructura correcta (faltan campos id u opName).');
+                }
+
+                // Sobrescribir datos locales (después de confirmar)
+                showCustomModal('info', 'Confirmación de Carga', 
+                    `Se cargarán ${validFlights.length} registros desde Google Sheets.\\nLos registros locales serán REEMPLAZADOS.\\n\\n¿Continuar?`,
+                    (confirmed) => {
+                        if(confirmed) {
+                            flights = validFlights;
+                            saveData();
+                            updateDashboard();
+                            showCustomModal('success', '✅ Carga Exitosa', 
+                                `Se cargaron ${validFlights.length} registros desde Google Sheets.`
+                            );
+                        }
+                    }
+                );
+
+            } catch(error) {
+                console.error('Error cargando desde Google Sheets:', error);
+                
+                let errorMsg = 'Error desconocido al cargar.';
+                if(error.message.includes('Failed to fetch')) {
+                    errorMsg = 'Error de red. Verifica:\n• Conexión a Internet\n• URL correcta del Google Apps Script\n• Que el script devuelva un array JSON';
+                } else if(error.message.includes('HTTP 404')) {
+                    errorMsg = 'URL no encontrada (404). Verifica que el Google Apps Script esté correctamente desplegado.';
+                } else if(error.message.includes('HTTP 403')) {
+                    errorMsg = 'Acceso denegado (403). En Google Apps Script, configura:\n• "Execute as": Tu usuario\n• "Who has access": Cualquiera';
+                } else {
+                    errorMsg = error.message;
+                }
+                
+                showCustomModal('error', '❌ Fallo al Cargar', errorMsg);
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }
+        }
+
+        // Hacer global la función para que se pueda usar desde HTML
+        window.syncToGoogleSheets = syncToGoogleSheets;
+        window.loadFromGoogleSheets = loadFromGoogleSheets;
 
         // Inicialización al cargar
         updateDashboard();
