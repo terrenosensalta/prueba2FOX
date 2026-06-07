@@ -108,7 +108,7 @@
                     <span class="text-xs text-slate-500">Integraciones (IA y Sheets)</span>
                     <div class="flex items-center gap-2 mt-0.5">
                         <input type="password" id="gemini-key" placeholder="API Key Gemini" class="bg-navy-800 border border-navy-700 rounded px-2 py-0.5 text-xs text-slate-300 focus:outline-none focus:border-cyanAccent-400 w-32" />
-                        <input type="text" id="sheets-url" value="https://script.google.com/macros/s/AKfycbwLoIgYiI5kmUC0adHZ7fSsHMSE6h-eGTRgO5BDXfHpvKaBgZkAQu8YhHxdwgF6Twv5GQ/exec" placeholder="Web App URL de Google Sheets" class="bg-navy-800 border border-navy-700 rounded px-2 py-0.5 text-xs text-slate-300 focus:outline-none focus:border-cyanAccent-400 w-44" title="URL pública del Google Apps Script desplegado" />
+                        <input type="text" id="sheets-url" value="https://script.google.com/macros/s/AKfycbwlpmOG7ClnC2_jkUGaPRlJCP90rdY0lXzTpcSRpbjh6yOIIy2I86EMAg6Yib_ZoukCtA/exec" placeholder="Web App URL de Google Sheets" class="bg-navy-800 border border-navy-700 rounded px-2 py-0.5 text-xs text-slate-300 focus:outline-none focus:border-cyanAccent-400 w-44" title="URL pública del Google Apps Script desplegado" />
                         <button id="btn-sync-sheets" title="Sincronizar TODOS los registros locales a Google Sheets" class="bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/40 hover:border-emerald-400 text-emerald-400 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 transition-all">
                             <i class="fa-solid fa-cloud-arrow-up"></i> Sincronizar Todo
                         </button>
@@ -1355,6 +1355,49 @@
             });
         }
 
+        // --- FUNCIÓN CENTRAL DE LECTURA DESDE GOOGLE SHEETS ---
+        function loadFromSheets(onSuccessCallback) {
+            const sheetsUrl = document.getElementById('sheets-url').value;
+            if (!sheetsUrl || sheetsUrl.trim() === '') return;
+
+            const btnSyncSheets = document.getElementById('btn-sync-sheets');
+            const originalHtml = btnSyncSheets ? btnSyncSheets.innerHTML : '';
+            if (btnSyncSheets) {
+                btnSyncSheets.disabled = true;
+                btnSyncSheets.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Cargando...';
+            }
+
+            // Petición GET al Apps Script Web App
+            fetch(sheetsUrl.trim())
+            .then(function(res) {
+                if (!res.ok) throw new Error("HTTP Status " + res.status);
+                return res.json();
+            })
+            .then(function(data) {
+                if (Array.isArray(data)) {
+                    // Si el servidor devolvió un array de registros, actualizamos el estado
+                    flightLogs = data;
+                    saveLogsToStorage();
+                    updateDashboardMetrics();
+                    updateCharts();
+                    renderLogs();
+                    if (onSuccessCallback) onSuccessCallback();
+                } else if (data && data.status === "error") {
+                    console.error("Error devuelto por Apps Script:", data.message);
+                }
+            })
+            .catch(function(error) {
+                console.error("Error al obtener datos de Google Sheets:", error);
+                // Si falla la red o el CORS, mantenemos el localStorage por seguridad
+            })
+            .finally(function() {
+                if (btnSyncSheets) {
+                    btnSyncSheets.disabled = false;
+                    btnSyncSheets.innerHTML = originalHtml;
+                }
+            });
+        }
+
         // --- BOTÓN: SINCRONIZAR TODOS LOS REGISTROS LOCALES A SHEETS ---
         const btnSyncSheets = document.getElementById('btn-sync-sheets');
         if (btnSyncSheets) {
@@ -1364,30 +1407,71 @@
                     showCustomAlert("URL Requerida", "Por favor ingresa la URL de tu Google Apps Script en el campo de encabezado antes de sincronizar.", "warning");
                     return;
                 }
-                if (flightLogs.length === 0) {
-                    showCustomAlert("Sin Registros", "No hay registros en la bitácora local para sincronizar.", "warning");
-                    return;
+                
+                showCustomAlert(
+                    "Sincronización de Bitácora",
+                    "¿Qué acción deseas realizar?",
+                    "info",
+                    function() {
+                        // Acción predeterminada: Cargar desde Sheets (Importar)
+                        loadFromSheets(function() {
+                            showCustomAlert("Bitácora Actualizada", "Los datos se han sincronizado desde Google Sheets correctamente.", "success");
+                        });
+                    }
+                );
+                
+                // Modificar dinámicamente los botones del alert para dar opciones claras
+                const btnsContainer = document.getElementById('alert-buttons-container');
+                if (btnsContainer) {
+                    btnsContainer.innerHTML = '';
+                    
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.className = "bg-navy-800 hover:bg-navy-700 text-slate-300 border border-navy-700 font-semibold px-3 py-1.5 rounded-lg text-xs transition-all";
+                    cancelBtn.textContent = "Cancelar";
+                    cancelBtn.onclick = function() { document.getElementById('custom-alert-modal').classList.add('hidden'); };
+                    btnsContainer.appendChild(cancelBtn);
+
+                    const pullBtn = document.createElement('button');
+                    pullBtn.className = "bg-sky-600 hover:bg-sky-500 text-white font-semibold px-3 py-1.5 rounded-lg text-xs transition-all";
+                    pullBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Traer de la Nube';
+                    pullBtn.onclick = function() {
+                        document.getElementById('custom-alert-modal').classList.add('hidden');
+                        loadFromSheets(function() {
+                            showCustomAlert("Éxito", "Historial actualizado desde Google Sheets en tiempo real.", "success");
+                        });
+                    };
+                    btnsContainer.appendChild(pullBtn);
+
+                    const pushBtn = document.createElement('button');
+                    pushBtn.className = "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3 py-1.5 rounded-lg text-xs transition-all";
+                    pushBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Enviar Locales a Nube';
+                    pushBtn.onclick = function() {
+                        document.getElementById('custom-alert-modal').classList.add('hidden');
+                        if (flightLogs.length === 0) {
+                            showCustomAlert("Sin Registros", "No hay registros locales para sincronizar.", "warning");
+                            return;
+                        }
+                        btnSyncSheets.disabled = true;
+                        btnSyncSheets.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Enviando...';
+
+                        let sent = 0;
+                        flightLogs.forEach(function(log) {
+                            sendToSheets(log);
+                            sent++;
+                        });
+
+                        setTimeout(function() {
+                            btnSyncSheets.disabled = false;
+                            btnSyncSheets.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Sincronizar Todo';
+                            showCustomAlert(
+                                "Sincronización Enviada",
+                                sent + " registro(s) local(es) fueron enviados a Google Sheets.",
+                                "success"
+                            );
+                        }, sent * 300 + 500);
+                    };
+                    btnsContainer.appendChild(pushBtn);
                 }
-
-                btnSyncSheets.disabled = true;
-                btnSyncSheets.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Sincronizando...';
-
-                let sent = 0;
-                flightLogs.forEach(function(log) {
-                    sendToSheets(log);
-                    sent++;
-                });
-
-                // Dar tiempo al navegador para enviar las peticiones en background
-                setTimeout(function() {
-                    btnSyncSheets.disabled = false;
-                    btnSyncSheets.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Sincronizar Todo';
-                    showCustomAlert(
-                        "Sincronización Enviada",
-                        sent + " registro(s) local(es) fueron enviados a Google Sheets. Verifica tu planilla en la nube para confirmar que llegaron correctamente.",
-                        "success"
-                    );
-                }, sent * 300 + 500);
             });
         }
 
@@ -1417,10 +1501,17 @@
             const sheetsUrlInput = document.getElementById('sheets-url');
             if (sheetsUrlInput) {
                 const savedUrl = localStorage.getItem('foxtrot_sheets_url');
-                if (savedUrl) sheetsUrlInput.value = savedUrl;
+                if (savedUrl) {
+                    sheetsUrlInput.value = savedUrl;
+                    // Intentar cargar dinámicamente desde Sheets en segundo plano al iniciar
+                    setTimeout(function() {
+                        loadFromSheets();
+                    }, 500);
+                }
                 
                 sheetsUrlInput.addEventListener('change', function() {
                     localStorage.setItem('foxtrot_sheets_url', this.value);
+                    loadFromSheets();
                 });
             }
         };
