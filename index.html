@@ -71,6 +71,9 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #00bbf9;
         }
+        .markdown-body p { margin-bottom: 0.5em; }
+        .markdown-body strong { color: #00f5d4; }
+        .markdown-body ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 0.5em; }
     </style>
 </head>
 <body class="bg-navy-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased">
@@ -79,7 +82,7 @@
     <header class="bg-navy-900 border-b border-navy-800 sticky top-0 z-40 glow-effect">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             
-            <!-- Logo Moderno SVG: Ojo/Cámara de Dron + Alas de Aviación -->
+            <!-- Logo Moderno SVG -->
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 flex items-center justify-center bg-navy-800 rounded-xl border border-cyanAccent-400/30">
                     <svg class="w-10 h-10 text-cyanAccent-400" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -131,7 +134,6 @@
         
         <!-- Dashboard Operativo Superior -->
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Métrica 1 -->
             <div class="bg-navy-900/60 border border-navy-800 rounded-xl p-5 flex items-center justify-between shadow-lg">
                 <div>
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Misiones Totales</span>
@@ -141,7 +143,6 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
             </div>
-            <!-- Métrica 2 -->
             <div class="bg-navy-900/60 border border-navy-800 rounded-xl p-5 flex items-center justify-between shadow-lg">
                 <div>
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tiempo en el Aire</span>
@@ -151,7 +152,6 @@
                     <i class="fa-solid fa-stopwatch"></i>
                 </div>
             </div>
-            <!-- Métrica 3 -->
             <div class="bg-navy-900/60 border border-navy-800 rounded-xl p-5 flex items-center justify-between shadow-lg">
                 <div>
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Viento Máx. Soportado</span>
@@ -161,7 +161,6 @@
                     <i class="fa-solid fa-wind"></i>
                 </div>
             </div>
-            <!-- Métrica 4 -->
             <div class="bg-navy-900/60 border border-navy-800 rounded-xl p-5 flex items-center justify-between shadow-lg">
                 <div>
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tasa de Novedades</span>
@@ -173,7 +172,7 @@
             </div>
         </section>
 
-        <!-- Estructura de dos columnas: Registro (Izquierda) y Analítica / Historial (Derecha) -->
+        <!-- Estructura de dos columnas -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
             <!-- COLUMNA IZQUIERDA: FORMULARIO DE REGISTRO (7/12) -->
@@ -241,7 +240,7 @@
                                     <i class="fa-solid fa-location-crosshairs group-hover:scale-110 transition-transform"></i>
                                 </button>
                                 <button type="button" id="btn-ai-preflight" class="bg-gradient-to-r from-cyanAccent-500/20 to-cyanAccent-400/20 border border-cyanAccent-500/50 hover:border-cyanAccent-400 text-cyanAccent-400 px-3 rounded-lg flex items-center gap-1 text-xs font-bold uppercase transition-all" title="Analizar Espacio Aéreo con IA de Búsqueda">
-                                    <i class="fa-solid fa-cloud-sun-rain"></i> Analizar Espacio Aéreo IA
+                                    <i class="fa-solid fa-cloud-sun-rain"></i> Analizar IA
                                 </button>
                             </div>
                             <span id="gps-status" class="text-[10px] text-slate-400 mt-1 block"></span>
@@ -252,11 +251,11 @@
                                     <h4 class="text-xs font-bold text-cyanAccent-400 flex items-center gap-1.5 uppercase tracking-wide">
                                         <i class="fa-solid fa-satellite-dish animate-pulse"></i> Reporte Pre-vuelo con Grounding de Búsqueda
                                     </h4>
-                                    <button type="button" onclick="closePreflightCheck()" class="text-slate-500 hover:text-rose-400 text-xs">
+                                    <button type="button" id="btn-close-preflight" class="text-slate-500 hover:text-rose-400 text-xs transition-colors">
                                         <i class="fa-solid fa-xmark"></i> Cerrar
                                     </button>
                                 </div>
-                                <div id="ai-preflight-content" class="text-xs text-slate-300 space-y-2 leading-relaxed max-h-60 overflow-y-auto pr-1"></div>
+                                <div id="ai-preflight-content" class="text-xs text-slate-300 space-y-2 leading-relaxed max-h-60 overflow-y-auto pr-1 markdown-body"></div>
                                 <div id="ai-preflight-sources" class="mt-3 pt-2 border-t border-navy-800 text-[10px] text-slate-400 flex flex-wrap gap-2"></div>
                             </div>
                         </div>
@@ -269,11 +268,11 @@
                         </h3>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-1">Velocidad del Viento (km/h) *</label>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Viento (km/h) *</label>
                                 <input type="number" step="0.1" id="flight-wind" required class="w-full bg-navy-800 border border-navy-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-cyanAccent-500 focus:outline-none transition-all" placeholder="Ej: 14.5">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-1">Altura de Vuelo (Metros) *</label>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Altura Máx (Metros) *</label>
                                 <input type="number" id="flight-altitude" required class="w-full bg-navy-800 border border-navy-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-cyanAccent-500 focus:outline-none transition-all" placeholder="Ej: 80">
                             </div>
                             <div>
@@ -323,7 +322,7 @@
 
                         <div id="novelty-detail-container" class="hidden">
                             <label class="block text-xs font-semibold text-rose-400 mb-1">Descripción del Incidente / Falla *</label>
-                            <textarea id="novelty-desc" class="w-full bg-navy-800 border border-navy-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-rose-500 focus:outline-none transition-all h-20" placeholder="Ej: Pérdida temporal del canal de telemetría a 1200 metros de distancia o comportamiento errático en rotor derecho..."></textarea>
+                            <textarea id="novelty-desc" class="w-full bg-navy-800 border border-navy-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-rose-500 focus:outline-none transition-all h-20" placeholder="Ej: Pérdida temporal del canal de telemetría a 1200 metros..."></textarea>
                         </div>
                     </div>
 
@@ -356,10 +355,10 @@
                             <div class="flex justify-between items-center mb-1">
                                 <label class="block text-xs font-semibold text-slate-300">Análisis Preliminar Técnico</label>
                                 <button type="button" id="btn-ai-analysis" class="text-xs font-bold text-cyanAccent-400 hover:text-cyanAccent-300 flex items-center gap-1.5 transition-all bg-navy-800 hover:bg-navy-700 px-2.5 py-1 rounded border border-navy-700">
-                                    <i class="fa-solid fa-wand-magic-sparkles animate-pulse"></i> Co-Piloto IA
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Co-Piloto IA
                                 </button>
                             </div>
-                            <textarea id="preliminary-analysis" class="w-full bg-navy-800 border border-navy-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-cyanAccent-500 focus:outline-none transition-all h-28" placeholder="Ej: Las capturas térmicas muestran un patrón de disipación de calor regular en los conectores del módulo solar, recomendándose revisión de par en el próximo preventivo."></textarea>
+                            <textarea id="preliminary-analysis" class="w-full bg-navy-800 border border-navy-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-cyanAccent-500 focus:outline-none transition-all h-28" placeholder="Escriba aquí el reporte preliminar o presione Co-Piloto IA para generar uno automático basado en los datos de la misión..."></textarea>
                         </div>
                     </div>
 
@@ -383,7 +382,7 @@
                 </div>
 
                 <!-- Historial de Bitácora -->
-                <div class="bg-navy-900/40 border border-navy-800 rounded-2xl p-6 shadow-xl backdrop-blur-sm flex-grow flex flex-col">
+                <div class="bg-navy-900/40 border border-navy-800 rounded-2xl p-6 shadow-xl backdrop-blur-sm flex-grow flex flex-col max-h-[600px]">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-navy-800 pb-4 mb-4">
                         <div>
                             <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wider flex items-center gap-2">
@@ -403,12 +402,16 @@
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500">
                             <i class="fa-solid fa-magnifying-glass text-xs"></i>
                         </span>
-                        <input type="text" id="search-bar" class="w-full bg-navy-800 border border-navy-700 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyanAccent-400 transition-all" placeholder="Buscar por piloto, dron, legajo o ubicación...">
+                        <input type="text" id="search-bar" class="w-full bg-navy-800 border border-navy-700 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyanAccent-400 transition-all" placeholder="Buscar por piloto, dron o ubicación...">
                     </div>
 
                     <!-- Contenedor dinámico de registros -->
-                    <div id="logs-container" class="space-y-3 max-h-[460px] overflow-y-auto pr-1 flex-grow">
+                    <div id="logs-container" class="space-y-3 overflow-y-auto pr-1 flex-grow">
                         <!-- Cargados mediante Javascript -->
+                        <div class="text-center text-slate-500 text-sm py-8">
+                            <i class="fa-solid fa-plane-slash text-3xl mb-2 opacity-50"></i>
+                            <p>No hay registros de vuelo archivados.</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -416,1144 +419,652 @@
     </main>
 
     <!-- Modal de Detalles de Vuelo -->
-    <div id="detail-modal" class="fixed inset-0 bg-navy-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-navy-900 border border-navy-800 max-w-2xl w-full rounded-2xl p-6 relative max-h-[90vh] overflow-y-auto glow-effect">
+    <div id="detail-modal" class="fixed inset-0 bg-navy-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-navy-900 border border-navy-800 max-w-2xl w-full rounded-2xl p-6 relative max-h-[90vh] overflow-y-auto glow-effect transform transition-transform duration-300 scale-95">
             <button id="close-modal" class="absolute top-4 right-4 text-slate-400 hover:text-cyanAccent-400 transition-all text-xl">
                 <i class="fa-solid fa-circle-xmark"></i>
             </button>
-            <div id="modal-content" class="space-y-6">
+            <div id="modal-content" class="space-y-4">
                 <!-- Rellenado dinámicamente con JavaScript -->
             </div>
         </div>
     </div>
 
     <!-- Alert/Confirm Modal Personalizado de Aviación (Reemplazo de alert/confirm nativos) -->
-    <div id="custom-alert-modal" class="fixed inset-0 bg-navy-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-navy-900 border border-navy-800 max-w-md w-full rounded-2xl p-6 relative glow-effect text-center space-y-4">
-            <div id="alert-icon-container" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl"></div>
-            <h3 id="alert-title" class="text-lg font-bold text-slate-100"></h3>
-            <p id="alert-message" class="text-sm text-slate-300 leading-relaxed"></p>
-            <div class="flex justify-center gap-3 pt-2" id="alert-buttons-container"></div>
+    <div id="custom-alert-modal" class="fixed inset-0 bg-navy-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-navy-900 border border-navy-800 max-w-sm w-full rounded-2xl p-6 relative shadow-2xl text-center glow-effect transform transition-transform duration-300 scale-95">
+            <div id="alert-icon-container" class="text-4xl mb-4 text-cyanAccent-400">
+                <i id="alert-icon" class="fa-solid fa-circle-info"></i>
+            </div>
+            <h3 id="alert-title" class="text-lg font-bold text-slate-100 mb-2 uppercase tracking-wide">Aviso del Sistema</h3>
+            <p id="alert-message" class="text-sm text-slate-300 mb-6"></p>
+            <div id="alert-buttons" class="flex justify-center gap-3">
+                <button id="btn-alert-cancel" class="hidden bg-navy-800 hover:bg-navy-700 border border-navy-700 text-slate-200 font-bold py-2 px-4 rounded-lg transition-all text-sm">Cancelar</button>
+                <button id="btn-alert-ok" class="bg-cyanAccent-500 hover:bg-cyanAccent-400 text-navy-950 font-bold py-2 px-6 rounded-lg transition-all text-sm">Entendido</button>
+            </div>
         </div>
     </div>
 
-    <!-- Pie de página con créditos -->
-    <footer class="bg-navy-950 border-t border-navy-900 py-6 text-center text-xs text-slate-500">
-        <p>&copy; 2026 Foxtrot Sky Eye. Diseñado para la excelencia operacional y aeronavegabilidad UAS.</p>
-    </footer>
-
-    <!-- JAVASCRIPT: Gestión del Estado, Cálculos, Interacciones y Gráficos -->
+    <!-- Scripts de la Aplicación -->
     <script>
-        let flightLogs = [];
+        // --- 1. ESTADO GLOBAL ---
+        let flights = JSON.parse(localStorage.getItem('foxtrot_flights') || '[]');
+        let currentImageBase64 = null;
         let chartInstance = null;
 
-        // Cargar registros por defecto si no existen en localStorage para tener datos iniciales vistosos
-        const initialMockLogs = [
-            {
-                id: '9b1b72b3-5717-4562-b3fc-2c963f66afa6',
-                operator: 'Víctor Pérez',
-                dni: '38452104',
-                legajo: 'LEG-4890A',
-                date: '2026-05-20',
-                startTime: '09:00',
-                endTime: '09:45',
-                duration: 45,
-                location: 'Zona Industrial Sur - Parque Solar',
-                wind: 12.4,
-                altitude: 90,
-                type: 'Lineal',
-                droneModel: 'DJI Matrice 300 RTK',
-                droneSN: 'M300RTK-4A87DF32',
-                batInitial: 100,
-                batFinal: 22,
-                hasNovelty: 'no',
-                noveltyDesc: '',
-                image: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&q=80&w=600',
-                analysis: 'Inspección de líneas y celdas fotovoltaicas térmicamente estables. No se registraron anomalías térmicas en el sector analizado.'
-            },
-            {
-                id: '20b3c678-8cf2-4f10-bf92-62287b927c99',
-                operator: 'Giselle Alarcón',
-                dni: '36904122',
-                legajo: 'LEG-3012B',
-                date: '2026-05-22',
-                startTime: '14:15',
-                endTime: '14:35',
-                duration: 20,
-                location: 'Antena de Telecomunicaciones - Sitio B',
-                wind: 24.8,
-                altitude: 115,
-                type: 'Orbital',
-                droneModel: 'DJI Inspire 3',
-                droneSN: 'INS3-9091BA',
-                batInitial: 95,
-                batFinal: 18,
-                hasNovelty: 'yes',
-                noveltyDesc: 'Ráfagas de viento de alta velocidad provocaron un aviso de esfuerzo severo en los rotores izquierdos. El sistema de compensación estabilizó la trayectoria rápidamente.',
-                image: 'https://images.unsplash.com/photo-1527977966376-1c8408f9f108?auto=format&fit=crop&q=80&w=600',
-                analysis: 'Inspección de la torre exitosa, pero debido a ráfagas de viento límite en la altitud de vuelo, se suspendió la segunda etapa de adquisición multimedia.'
-            }
-        ];
+        // --- 2. GESTIÓN DE MODALES Y ALERTAS (Reemplazo de alert/confirm) ---
+        const alertModal = document.getElementById('custom-alert-modal');
+        const alertTitle = document.getElementById('alert-title');
+        const alertMessage = document.getElementById('alert-message');
+        const alertIcon = document.getElementById('alert-icon');
+        const alertIconContainer = document.getElementById('alert-icon-container');
+        const btnAlertOk = document.getElementById('btn-alert-ok');
+        const btnAlertCancel = document.getElementById('btn-alert-cancel');
+        let confirmCallback = null;
 
-        // Inicializador del Reloj UTC del sistema
-        function updateUTClock() {
+        function showCustomModal(type, title, message, onConfirm = null) {
+            alertTitle.textContent = title;
+            alertMessage.textContent = message;
+            
+            // Configurar estilos según el tipo
+            if(type === 'error') {
+                alertIcon.className = "fa-solid fa-triangle-exclamation";
+                alertIconContainer.className = "text-4xl mb-4 text-rose-500";
+                btnAlertOk.className = "bg-rose-500 hover:bg-rose-400 text-white font-bold py-2 px-6 rounded-lg transition-all text-sm";
+            } else if(type === 'success') {
+                alertIcon.className = "fa-solid fa-check-circle";
+                alertIconContainer.className = "text-4xl mb-4 text-emerald-500";
+                btnAlertOk.className = "bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-2 px-6 rounded-lg transition-all text-sm";
+            } else { // info/confirm
+                alertIcon.className = "fa-solid fa-circle-info";
+                alertIconContainer.className = "text-4xl mb-4 text-cyanAccent-400";
+                btnAlertOk.className = "bg-cyanAccent-500 hover:bg-cyanAccent-400 text-navy-950 font-bold py-2 px-6 rounded-lg transition-all text-sm";
+            }
+
+            if(onConfirm) {
+                btnAlertCancel.classList.remove('hidden');
+                confirmCallback = onConfirm;
+            } else {
+                btnAlertCancel.classList.add('hidden');
+                confirmCallback = null;
+            }
+
+            alertModal.classList.remove('hidden');
+            setTimeout(() => {
+                alertModal.classList.remove('opacity-0');
+                alertModal.firstElementChild.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeCustomModal() {
+            alertModal.classList.add('opacity-0');
+            alertModal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => { alertModal.classList.add('hidden'); }, 300);
+        }
+
+        btnAlertOk.addEventListener('click', () => {
+            closeCustomModal();
+            if(confirmCallback) confirmCallback(true);
+        });
+        
+        btnAlertCancel.addEventListener('click', () => {
+            closeCustomModal();
+            if(confirmCallback) confirmCallback(false);
+        });
+
+
+        // --- 3. RELOJ UTC ---
+        function updateClock() {
             const now = new Date();
-            const utcString = now.toUTCString().replace("GMT", "UTC");
-            const timePart = utcString.split(', ');
-            if (timePart && timePart[1]) {
-                document.getElementById('current-utc-time').textContent = timePart[1];
-            } else {
-                document.getElementById('current-utc-time').textContent = now.toISOString();
-            }
+            const utcTime = now.toUTCString().split(' ')[4];
+            document.getElementById('current-utc-time').textContent = utcTime + ' UTC';
         }
-        setInterval(updateUTClock, 1000);
-        updateUTClock();
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        // --- SISTEMA DE DIÁLOGOS PERSONALIZADOS (REEMPLAZO DE ALERT / CONFIRM) ---
-        function showCustomAlert(title, message, type, onConfirm, isConfirmType) {
-            const modal = document.getElementById('custom-alert-modal');
-            const iconContainer = document.getElementById('alert-icon-container');
-            const titleEl = document.getElementById('alert-title');
-            const msgEl = document.getElementById('alert-message');
-            const btnsContainer = document.getElementById('alert-buttons-container');
+        // --- 4. GESTIÓN DE LOCALSTORAGE (API KEYS) ---
+        const geminiInput = document.getElementById('gemini-key');
+        const sheetsInput = document.getElementById('sheets-url');
 
-            titleEl.textContent = title;
-            msgEl.textContent = message;
-            
-            // Estilos del ícono según severidad
-            if (type === 'error') {
-                iconContainer.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl bg-rose-500/20 text-rose-400 border border-rose-500/40";
-                iconContainer.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
-            } else if (type === 'success') {
-                iconContainer.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
-                iconContainer.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
-            } else if (type === 'warning') {
-                iconContainer.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl bg-amber-500/20 text-amber-400 border border-amber-500/40";
-                iconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
-            } else {
-                iconContainer.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl bg-cyanAccent-500/20 text-cyanAccent-400 border border-cyanAccent-400/30";
-                iconContainer.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
-            }
+        geminiInput.value = localStorage.getItem('gemini_key') || '';
+        sheetsInput.value = localStorage.getItem('sheets_url') || 'https://script.google.com/macros/s/AKfycbwlpmOG7ClnC2_jkUGaPRlJCP90rdY0lXzTpcSRpbjh6yOIIy2I86EMAg6Yib_ZoukCtA/exec';
 
-            btnsContainer.innerHTML = '';
-            
-            if (isConfirmType) {
-                const cancelBtn = document.createElement('button');
-                cancelBtn.className = "bg-navy-800 hover:bg-navy-700 text-slate-300 border border-navy-700 font-semibold px-4 py-2 rounded-lg text-xs transition-all";
-                cancelBtn.textContent = "Cancelar";
-                cancelBtn.onclick = function() { modal.classList.add('hidden'); };
-                btnsContainer.appendChild(cancelBtn);
+        geminiInput.addEventListener('change', (e) => localStorage.setItem('gemini_key', e.target.value));
+        sheetsInput.addEventListener('change', (e) => localStorage.setItem('sheets_url', e.target.value));
 
-                const acceptBtn = document.createElement('button');
-                acceptBtn.className = "bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-400 hover:to-rose-500 text-white font-semibold px-4 py-2 rounded-lg text-xs transition-all";
-                acceptBtn.textContent = "Eliminar";
-                acceptBtn.onclick = function() {
-                    modal.classList.add('hidden');
-                    if (onConfirm) onConfirm();
-                };
-                btnsContainer.appendChild(acceptBtn);
-            } else {
-                const okBtn = document.createElement('button');
-                okBtn.className = "bg-gradient-to-r from-cyanAccent-500 to-cyanAccent-400 text-navy-950 font-bold px-5 py-2 rounded-lg text-xs transition-all";
-                okBtn.textContent = "Entendido";
-                okBtn.onclick = function() {
-                    modal.classList.add('hidden');
-                    if (onConfirm) onConfirm();
-                };
-                btnsContainer.appendChild(okBtn);
-            }
-
-            modal.classList.remove('hidden');
-        }
-
-        // --- 2. MANEJO DEL LOCAL STORAGE & DATOS ---
-        function loadLogs() {
-            const stored = localStorage.getItem('foxtrot_flight_logs');
-            if (stored) {
-                try {
-                    flightLogs = JSON.parse(stored);
-                } catch (e) {
-                    console.error("Error al leer datos locales, cargando mockups", e);
-                    flightLogs = initialMockLogs;
-                }
-            } else {
-                flightLogs = initialMockLogs;
-                saveLogsToStorage();
-            }
-        }
-
-        function saveLogsToStorage() {
-            localStorage.setItem('foxtrot_flight_logs', JSON.stringify(flightLogs));
-        }
-
-        // --- 3. GESTIÓN DEL FORMULARIO Y AUTOMATIZACIONES ---
-        // Cálculo automático de duración de vuelo
+        // --- 5. LÓGICA DE FORMULARIO: FECHAS Y DURACIÓN ---
+        document.getElementById('flight-date').valueAsDate = new Date();
+        
         const startInput = document.getElementById('flight-start');
         const endInput = document.getElementById('flight-end');
         const durationDisplay = document.getElementById('flight-duration-display');
 
         function calculateDuration() {
-            const startVal = startInput.value;
-            const endVal = endInput.value;
-            if (startVal && endVal) {
-                const startParts = startVal.split(':');
-                const endParts = endVal.split(':');
-                const startH = Number(startParts[0]);
-                const startM = Number(startParts[1]);
-                const endH = Number(endParts[0]);
-                const endM = Number(endParts[1]);
-                
-                let startMinutes = startH * 60 + startM;
-                let endMinutes = endH * 60 + endM;
-                
-                // Si pasa la medianoche
-                if (endMinutes < startMinutes) {
-                    endMinutes += 24 * 60;
-                }
-                
-                const diff = endMinutes - startMinutes;
-                durationDisplay.textContent = diff + " min";
-                return diff;
-            }
-            durationDisplay.textContent = "0 min";
-            return 0;
+            if(!startInput.value || !endInput.value) return 0;
+            const start = new Date(`1970-01-01T${startInput.value}`);
+            const end = new Date(`1970-01-01T${endInput.value}`);
+            let diff = (end - start) / 60000; // en minutos
+            if (diff < 0) diff += 24 * 60; // cruce de medianoche
+            durationDisplay.textContent = `${diff} min`;
+            return diff;
         }
 
         startInput.addEventListener('change', calculateDuration);
         endInput.addEventListener('change', calculateDuration);
 
-        // Geolocalización mediante API del Navegador
-        const gpsButton = document.getElementById('btn-gps');
-        const locationInput = document.getElementById('flight-location');
-        const gpsStatus = document.getElementById('gps-status');
-
-        gpsButton.addEventListener('click', function() {
-            if (!navigator.geolocation) {
-                gpsStatus.textContent = "Geolocalización no soportada por su navegador.";
-                gpsStatus.className = "text-[10px] text-rose-400 mt-1 block";
-                return;
-            }
-            gpsStatus.textContent = "Obteniendo datos satelitales...";
-            gpsStatus.className = "text-[10px] text-cyanAccent-400 mt-1 block";
-
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    const lat = position.coords.latitude.toFixed(6);
-                    const lon = position.coords.longitude.toFixed(6);
-                    locationInput.value = lat + ", " + lon;
-                    gpsStatus.textContent = "Coordenadas capturadas con éxito.";
-                    gpsStatus.className = "text-[10px] text-emerald-400 mt-1 block";
-                },
-                function(error) {
-                    gpsStatus.textContent = "No se pudo acceder al GPS del dispositivo.";
-                    gpsStatus.className = "text-[10px] text-amber-500 mt-1 block";
-                }
-            );
-        });
-
-        // Visibilidad de novedades según desplegable
+        // --- 6. LÓGICA DE FORMULARIO: NOVEDADES ---
         const hasNoveltySelect = document.getElementById('has-novelty');
         const noveltyContainer = document.getElementById('novelty-detail-container');
-        const noveltyDescInput = document.getElementById('novelty-desc');
+        const noveltyDesc = document.getElementById('novelty-desc');
 
-        hasNoveltySelect.addEventListener('change', function() {
-            if (hasNoveltySelect.value === 'yes') {
+        hasNoveltySelect.addEventListener('change', (e) => {
+            if(e.target.value === 'yes') {
                 noveltyContainer.classList.remove('hidden');
-                noveltyDescInput.setAttribute('required', 'true');
+                noveltyDesc.required = true;
             } else {
                 noveltyContainer.classList.add('hidden');
-                noveltyDescInput.removeAttribute('required');
-                noveltyDescInput.value = '';
+                noveltyDesc.required = false;
+                noveltyDesc.value = '';
             }
         });
 
-        // Drag & Drop de Imágenes y Conversión a Base64
+        // --- 7. LÓGICA DE FORMULARIO: GPS ---
+        document.getElementById('btn-gps').addEventListener('click', () => {
+            const statusLabel = document.getElementById('gps-status');
+            statusLabel.textContent = "Obteniendo fix satelital...";
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude.toFixed(6);
+                        const lon = position.coords.longitude.toFixed(6);
+                        document.getElementById('flight-location').value = `${lat}, ${lon}`;
+                        statusLabel.textContent = "Fix obtenido con éxito.";
+                        statusLabel.className = "text-[10px] text-emerald-400 mt-1 block";
+                    },
+                    (error) => {
+                        statusLabel.textContent = "Error GPS: " + error.message;
+                        statusLabel.className = "text-[10px] text-rose-400 mt-1 block";
+                    }
+                );
+            } else {
+                statusLabel.textContent = "Geolocalización no soportada en el navegador.";
+            }
+        });
+
+        // --- 8. LÓGICA DE FORMULARIO: IMÁGENES (DRAG & DROP) ---
         const dropzone = document.getElementById('dropzone');
         const fileInput = document.getElementById('image-upload');
-        const previewContainer = document.getElementById('image-preview-container');
-        const previewImg = document.getElementById('image-preview');
+        const imgPreviewContainer = document.getElementById('image-preview-container');
+        const imgPreview = document.getElementById('image-preview');
         const btnRemoveImg = document.getElementById('btn-remove-image');
-        let currentImageBase64 = null;
 
-        dropzone.addEventListener('click', function() { fileInput.click(); });
-
-        dropzone.addEventListener('dragover', function(e) {
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('border-cyanAccent-500'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('border-cyanAccent-500'));
+        dropzone.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropzone.classList.add('border-cyanAccent-400');
+            dropzone.classList.remove('border-cyanAccent-500');
+            if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', (e) => {
+            if(e.target.files.length) handleFile(e.target.files[0]);
         });
 
-        dropzone.addEventListener('dragleave', function() {
-            dropzone.classList.remove('border-cyanAccent-400');
-        });
-
-        dropzone.addEventListener('drop', function(e) {
-            e.preventDefault();
-            dropzone.classList.remove('border-cyanAccent-400');
-            const file = e.dataTransfer.files[0];
-            if (file && file.type && file.type.indexOf('image/') === 0) {
-                processImage(file);
-            }
-        });
-
-        fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                processImage(file);
-            }
-        });
-
-        function processImage(file) {
+        function handleFile(file) {
+            if(!file.type.startsWith('image/')) return showCustomModal('error', 'Error de Archivo', 'Solo se admiten formatos de imagen.');
+            
             const reader = new FileReader();
-            reader.onload = function(event) {
-                currentImageBase64 = event.target.result;
-                previewImg.src = currentImageBase64;
-                previewContainer.classList.remove('hidden');
+            reader.onload = (e) => {
+                currentImageBase64 = e.target.result;
+                imgPreview.src = currentImageBase64;
                 dropzone.classList.add('hidden');
+                imgPreviewContainer.classList.remove('hidden');
             };
             reader.readAsDataURL(file);
         }
 
-        btnRemoveImg.addEventListener('click', function(e) {
-            e.stopPropagation();
+        btnRemoveImg.addEventListener('click', () => {
             currentImageBase64 = null;
-            previewImg.src = '#';
-            previewContainer.classList.add('hidden');
-            dropzone.classList.remove('hidden');
             fileInput.value = '';
+            imgPreview.src = '#';
+            imgPreviewContainer.classList.add('hidden');
+            dropzone.classList.remove('hidden');
         });
 
-        // --- SECCIÓN: INTEGRACIÓN CON GEMINI API ---
-        function fetchGeminiWithRetry(url, payload, retries, delay) {
-            const activeRetries = typeof retries === 'number' ? retries : 3;
-            const activeDelay = typeof delay === 'number' ? delay : 1000;
+        // --- 9. API CALLS CON RETRY (Backoff Exponencial) ---
+        async function fetchWithRetry(url, options, maxRetries = 5) {
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    if (i === maxRetries - 1) throw error;
+                    await new Promise(resolve => setTimeout(resolve, delays[i]));
+                }
+            }
+        }
+
+        // --- 10. INTEGRACIÓN GEMINI: PREFLIGHT (BÚSQUEDA) ---
+        document.getElementById('btn-ai-preflight').addEventListener('click', async () => {
+            const apiKey = geminiInput.value.trim();
+            const location = document.getElementById('flight-location').value.trim();
             
-            return new Promise(function(resolve, reject) {
-                function attempt(currentRetry, currentDelay) {
-                    fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    })
-                    .then(function(response) {
-                        if (response.ok) {
-                            resolve(response);
-                        } else if (response.status === 429 && currentRetry < activeRetries - 1) {
-                            console.warn("Límite de peticiones. Reintentando en " + currentDelay + "ms...");
-                            setTimeout(function() {
-                                attempt(currentRetry + 1, currentDelay * 2);
-                            }, currentDelay);
-                        } else {
-                            reject(new Error("Error de API: " + response.status));
-                        }
-                    })
-                    .catch(function(error) {
-                        if (currentRetry < activeRetries - 1) {
-                            setTimeout(function() {
-                                attempt(currentRetry + 1, currentDelay * 2);
-                            }, currentDelay);
-                        } else {
-                            reject(error);
+            if(!apiKey) return showCustomModal('error', 'Clave API Faltante', 'Ingrese la clave de Gemini en la esquina superior derecha.');
+            if(!location) return showCustomModal('error', 'Ubicación Requerida', 'Ingrese o capture la ubicación geográfica primero.');
+
+            const btn = document.getElementById('btn-ai-preflight');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analizando...';
+            btn.disabled = true;
+
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                
+                const promptText = `Actúa como un controlador de tráfico aéreo y especialista ambiental. 
+Analiza las condiciones actuales, clima y el espacio aéreo en la ubicación: "${location}".
+Indica si hay zonas prohibidas (aeropuertos cercanos, prisiones, militares), el clima esperado y precauciones para operar un drone (UAS) allí. Sé breve, en formato de lista.`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: promptText }] }],
+                    tools: [{ "google_search": {} }] // Grounding
+                };
+
+                const data = await fetchWithRetry(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const textResp = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                const attributions = data.candidates?.[0]?.groundingMetadata?.groundingAttributions;
+                
+                const container = document.getElementById('ai-preflight-container');
+                const contentDiv = document.getElementById('ai-preflight-content');
+                const sourcesDiv = document.getElementById('ai-preflight-sources');
+
+                contentDiv.innerHTML = marked.parse(textResp || 'No se pudo generar el reporte.');
+                
+                sourcesDiv.innerHTML = '';
+                if(attributions && attributions.length > 0) {
+                    sourcesDiv.innerHTML = '<span class="font-bold">Fuentes de Verificación:</span> ';
+                    attributions.forEach(attr => {
+                        if(attr.web?.uri) {
+                            sourcesDiv.innerHTML += `<a href="${attr.web.uri}" target="_blank" class="text-cyanAccent-500 hover:underline mx-1">[${attr.web.title || 'Enlace'}]</a>`;
                         }
                     });
                 }
-                attempt(0, activeDelay);
-            });
-        }
 
-        function getGeminiConfig() {
-            // Revisa si el usuario ingresó manualmente una API Key
-            const manualKey = document.getElementById('gemini-key').value.trim();
-            const apiKey = manualKey || ""; // Dejar vacío si se inyecta desde backend/proxy
-            const model = 'gemini-1.5-flash';
-            const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + apiKey;
-            return { apiUrl: apiUrl, manualKey: manualKey };
-        }
+                container.classList.remove('hidden');
 
-        function getRawBase64(dataUrl) {
-            if (!dataUrl) return null;
-            const parts = dataUrl.split(',');
-            return parts.length > 1 ? parts[1] : parts[0];
-        }
-
-        function getMimeType(dataUrl) {
-            if (!dataUrl) return "image/jpeg";
-            const match = dataUrl.match(/data:([^;]+);/);
-            return match ? match[1] : "image/jpeg";
-        }
-
-        // --- FUNCIÓN 1: PRE-FLIGHT RISK ASSESSMENT (IA con Grounding en Búsqueda de Google) ---
-        const preflightBtn = document.getElementById('btn-ai-preflight');
-        const preflightContainer = document.getElementById('ai-preflight-container');
-        const preflightContent = document.getElementById('ai-preflight-content');
-        const preflightSources = document.getElementById('ai-preflight-sources');
-
-        window.closePreflightCheck = function() {
-            preflightContainer.classList.add('hidden');
-        };
-
-        preflightBtn.addEventListener('click', function() {
-            const loc = locationInput.value.trim();
-            if (!loc) {
-                showCustomAlert("Falta ubicación", "Por favor ingresa o captura una ubicación geográfica (Coordenadas o nombre de sitio) antes de realizar el análisis pre-vuelo.", "warning");
-                return;
+            } catch (error) {
+                showCustomModal('error', 'Fallo en IA', 'No se pudo obtener el análisis. Verifique su API Key e Internet.');
+                console.error(error);
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
             }
-
-            preflightContainer.classList.remove('hidden');
-            preflightContent.innerHTML = `
-                <div class="flex items-center gap-2 text-cyanAccent-400 py-3">
-                    <i class="fa-solid fa-spinner animate-spin"></i>
-                    <span>Buscando restricciones de espacio aéreo, alertas meteorológicas y NOTAMs locales de hoy en tiempo real...</span>
-                </div>
-            `;
-            preflightSources.innerHTML = '';
-
-            const systemPrompt = "Actúa como un Oficial de Seguridad de Operaciones UAS (Drones). Proporciona un análisis pre-vuelo estructurado que identifique: 1) Factores climatológicos severos de hoy, 2) Restricciones de espacio aéreo (UAV/NOTAMs si existen) y 3) Recomendaciones operativas específicas de seguridad aeronáutica para el operador. El tono debe ser formal, preventivo y técnico.";
-            const query = "Analiza detalladamente las condiciones de vuelo y restricciones aéreas/clima de hoy en la ubicación: " + loc + ". Usa Google Search para obtener información aeronáutica en tiempo real.";
-
-            const config = getGeminiConfig();
-            if (!config.manualKey) {
-                preflightContent.innerHTML = `
-                    <div class="p-3 bg-rose-950/30 border border-rose-500/20 text-rose-400 rounded-lg">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                        <span>Para usar el análisis de Espacio Aéreo IA de Gemini, por favor introduce tu API Key de Gemini en la esquina superior derecha del encabezado. Es gratuita y se almacena únicamente de forma local.</span>
-                    </div>
-                `;
-                return;
-            }
-
-            const payload = {
-                contents: [{ parts: [{ text: query }] }],
-                tools: [{ googleSearch: {} }],
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                }
-            };
-
-            fetchGeminiWithRetry(config.apiUrl, payload)
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(data) {
-                const candidate = (data.candidates && data.candidates[0]) ? data.candidates[0] : null;
-                if (candidate && candidate.content && candidate.content.parts && candidate.content.parts[0] && candidate.content.parts[0].text) {
-                    const rawText = candidate.content.parts[0].text;
-                    preflightContent.innerHTML = marked.parse(rawText);
-
-                    // Extraer citas de búsqueda si existen de forma segura
-                    let sourcesHtml = "";
-                    const metadata = candidate.groundingMetadata;
-                    const attributions = (metadata && metadata.groundingAttributions) ? metadata.groundingAttributions : null;
-                    if (attributions && attributions.length > 0) {
-                        sourcesHtml += '<span class="font-bold text-cyanAccent-400 block w-full mb-1">Fuentes y Referencias:</span>';
-                        const uniqueSources = {};
-                        attributions.forEach(function(attr) {
-                            const web = attr.web;
-                            if (web && web.uri && web.title) {
-                                uniqueSources[web.uri] = web.title;
-                            }
-                        });
-                        Object.keys(uniqueSources).forEach(function(uri) {
-                            const title = uniqueSources[uri];
-                            sourcesHtml += '<a href="' + uri + '" target="_blank" class="bg-navy-800 hover:bg-navy-700 text-cyanAccent-500 hover:text-cyanAccent-400 px-2 py-1 rounded inline-flex items-center gap-1 transition-all"><i class="fa-solid fa-arrow-up-right-from-square text-[8px]"></i> ' + title.substring(0, 30) + '...</a>';
-                        });
-                    }
-                    preflightSources.innerHTML = sourcesHtml || '<span class="text-slate-500">No se recuperaron enlaces de fuentes directas, pero se generó el reporte con IA.</span>';
-                } else {
-                    throw new Error("Estructura de respuesta inesperada.");
-                }
-            })
-            .catch(function(error) {
-                console.error("Gemini Preflight Error:", error);
-                preflightContent.innerHTML = `
-                    <div class="p-3 bg-rose-950/30 border border-rose-500/20 text-rose-400 rounded-lg flex items-center gap-2">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                        <span>No se pudo completar el análisis del espacio aéreo por IA. Verifica tu API Key e intenta de nuevo.</span>
-                    </div>
-                `;
-            });
         });
 
-        // --- FUNCIÓN 2: DIAGNÓSTICO CO-PILOTO POST-VUELO (IA Multimodal con opcional análisis de imagen) ---
-        const aiAnalysisBtn = document.getElementById('btn-ai-analysis');
-        const preliminaryAnalysisInput = document.getElementById('preliminary-analysis');
+        document.getElementById('btn-close-preflight').addEventListener('click', () => {
+            document.getElementById('ai-preflight-container').classList.add('hidden');
+        });
 
-        aiAnalysisBtn.addEventListener('click', function() {
-            const opName = document.getElementById('op-name').value;
-            const flightType = document.getElementById('flight-type').value;
-            const droneModel = document.getElementById('dron-model').value;
+        // --- 11. INTEGRACIÓN GEMINI: CO-PILOTO TÉCNICO (IMÁGENES) ---
+        document.getElementById('btn-ai-analysis').addEventListener('click', async () => {
+            const apiKey = geminiInput.value.trim();
+            if(!apiKey) return showCustomModal('error', 'Clave API Faltante', 'Ingrese la clave de Gemini en la esquina superior derecha.');
+
+            // Recolectar datos
+            const type = document.getElementById('flight-type').value;
+            const model = document.getElementById('dron-model').value;
+            const batI = document.getElementById('bat-initial').value;
+            const batF = document.getElementById('bat-final').value;
             const wind = document.getElementById('flight-wind').value;
-            const altitude = document.getElementById('flight-altitude').value;
-            const batInitial = document.getElementById('bat-initial').value;
-            const batFinal = document.getElementById('bat-final').value;
-            const hasNovelty = document.getElementById('has-novelty').value;
-            const noveltyDesc = document.getElementById('novelty-desc').value;
+            const alt = document.getElementById('flight-altitude').value;
+            const novelty = document.getElementById('has-novelty').value;
+            const noveltyTxt = document.getElementById('novelty-desc').value;
 
-            // Validación mínima para alimentar a la IA
-            if (!droneModel || !wind || !altitude || !batInitial || !batFinal) {
-                showCustomAlert("Faltan parámetros", "Para realizar un diagnóstico preciso, el Co-Piloto necesita que al menos configures el Modelo del Dron, Viento, Altura Máxima y porcentajes de Batería.", "warning");
-                return;
-            }
+            const btn = document.getElementById('btn-ai-analysis');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando...';
+            btn.disabled = true;
 
-            const initialText = preliminaryAnalysisInput.value;
-            preliminaryAnalysisInput.value = "Generando diagnóstico con Co-Piloto de IA (analizando métricas y evidencia multimedia)...";
-            preliminaryAnalysisInput.disabled = true;
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                
+                let promptText = `Eres un ingeniero aeronáutico experto en UAS. Genera un reporte técnico de 3 líneas máximo basado en esta misión:
+- Dron: ${model || 'No especificado'}
+- Tipo de vuelo: ${type} a ${alt || 0}m de altura.
+- Batería: ${batI}% -> ${batF}%.
+- Viento: ${wind || 0} km/h.
+- Novedades: ${novelty === 'yes' ? noveltyTxt : 'Ninguna'}.`;
 
-            const systemPrompt = "Eres un analista experto en mantenimiento, ingeniería de aeronavegabilidad aeronáutica y seguridad de sistemas UAS. Genera un análisis formal técnico preliminar breve y robusto en base a los datos operativos y la imagen cargada (si la hay). Detalla salud del dron, rendimiento del consumo de batería, riesgo del viento y estado operativo final. Devuelve solo el párrafo de análisis técnico directo sin títulos ni introducciones.";
-            
-            let query = "Genera un Análisis Técnico del siguiente vuelo:" +
-                "\n- Operador: " + (opName || 'Desconocido') +
-                "\n- Tipo de Vuelo: " + (flightType || 'Estándar') +
-                "\n- Aeronave: " + droneModel +
-                "\n- Viento Máximo: " + wind + " km/h" +
-                "\n- Altura Máxima: " + altitude + " metros" +
-                "\n- Baterías: " + batInitial + "% inicial a " + batFinal + "% final" +
-                "\n- Novedad Registrada: " + (hasNovelty === 'yes' ? noveltyDesc : 'Sin novedades incidentales registradas') + ".";
+                const parts = [{ text: promptText }];
 
-            if (currentImageBase64) {
-                query += " Se adjunta captura/evidencia de campo. Por favor analiza si la imagen muestra anomalías visuales, térmicas, estructurales o problemas de composición de relevancia técnica.";
-            }
+                // Agregar imagen si existe
+                if(currentImageBase64) {
+                    const base64Data = currentImageBase64.split(',')[1];
+                    const mimeType = currentImageBase64.split(';')[0].split(':')[1];
+                    parts.push({
+                        inlineData: { mimeType: mimeType, data: base64Data }
+                    });
+                    promptText += `\nAdemás, analiza la imagen adjunta capturada durante la misión y menciona cualquier anomalía visual.`;
+                    parts[0].text = promptText; 
+                }
 
-            const config = getGeminiConfig();
-            if (!config.manualKey) {
-                preliminaryAnalysisInput.value = "Para utilizar el Co-Piloto IA, por favor introduce tu API Key de Gemini en la esquina superior derecha.";
-                preliminaryAnalysisInput.disabled = false;
-                return;
-            }
-            
-            const parts = [{ text: query }];
-            if (currentImageBase64) {
-                parts.push({
-                    inlineData: {
-                        mimeType: getMimeType(currentImageBase64),
-                        data: getRawBase64(currentImageBase64)
-                    }
+                const payload = {
+                    contents: [{ role: "user", parts: parts }]
+                };
+
+                const data = await fetchWithRetry(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
-            }
 
-            const payload = {
-                contents: [{ parts: parts }],
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                }
-            };
-
-            fetchGeminiWithRetry(config.apiUrl, payload)
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(data) {
-                const candidate = (data.candidates && data.candidates[0]) ? data.candidates[0] : null;
-                if (candidate && candidate.content && candidate.content.parts && candidate.content.parts[0] && candidate.content.parts[0].text) {
-                    preliminaryAnalysisInput.value = candidate.content.parts[0].text.trim();
+                const textResp = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if(textResp) {
+                    document.getElementById('preliminary-analysis').value = textResp;
                 } else {
-                    throw new Error("No se pudo extraer texto.");
+                    throw new Error("Respuesta vacía de IA");
                 }
-            })
-            .catch(function(error) {
-                console.error("Gemini Co-Pilot Analysis Error:", error);
-                preliminaryAnalysisInput.value = initialText;
-                showCustomAlert("Error de Diagnóstico", "No se pudo comunicar con el asistente técnico IA. Revisa tu clave de API o conexión a internet.", "error");
-            })
-            .finally(function() {
-                preliminaryAnalysisInput.disabled = false;
-            });
+
+            } catch(error) {
+                showCustomModal('error', 'Fallo en Co-Piloto', 'Ocurrió un error al generar el análisis. Revise su conexión y API Key.');
+                console.error(error);
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }
         });
 
-        // --- 4. GESTIÓN DE INTERFAZ Y ESTADÍSTICAS (MÉTRICAS) ---
-        function updateDashboardMetrics() {
-            document.getElementById('stat-total-flights').textContent = flightLogs.length;
 
-            const totalDuration = flightLogs.reduce(function(sum, item) {
-                return sum + (Number(item.duration) || 0);
-            }, 0);
-            document.getElementById('stat-total-duration').textContent = totalDuration + " min";
+        // --- 12. ENVÍO DEL FORMULARIO Y ALMACENAMIENTO ---
+        document.getElementById('flight-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const duration = calculateDuration();
 
-            const maxWind = flightLogs.length > 0 ? Math.max.apply(Math, flightLogs.map(function(item) { return Number(item.wind) || 0; })) : 0;
-            document.getElementById('stat-max-wind').textContent = maxWind.toFixed(1) + " km/h";
+            const newFlight = {
+                id: 'UAS-' + Date.now().toString().slice(-6),
+                dateStr: new Date().toISOString(),
+                opName: document.getElementById('op-name').value,
+                opDni: document.getElementById('op-dni').value,
+                opLegajo: document.getElementById('op-legajo').value,
+                flightDate: document.getElementById('flight-date').value,
+                startTime: document.getElementById('flight-start').value,
+                endTime: document.getElementById('flight-end').value,
+                duration: duration,
+                location: document.getElementById('flight-location').value,
+                wind: parseFloat(document.getElementById('flight-wind').value),
+                altitude: document.getElementById('flight-altitude').value,
+                type: document.getElementById('flight-type').value,
+                droneModel: document.getElementById('dron-model').value,
+                droneSn: document.getElementById('dron-sn').value,
+                batInitial: document.getElementById('bat-initial').value,
+                batFinal: document.getElementById('bat-final').value,
+                hasNovelty: document.getElementById('has-novelty').value === 'yes',
+                noveltyDesc: document.getElementById('novelty-desc').value,
+                analysis: document.getElementById('preliminary-analysis').value,
+                image: currentImageBase64 // Almacena en base64 (Atención a la cuota en un entorno real)
+            };
 
-            const withNovelty = flightLogs.filter(function(item) { return item.hasNovelty === 'yes'; }).length;
-            const rate = flightLogs.length > 0 ? ((withNovelty / flightLogs.length) * 100).toFixed(1) : 0;
-            document.getElementById('stat-novelty-rate').textContent = rate + "%";
+            flights.unshift(newFlight);
+            saveData();
+            
+            showCustomModal('success', 'Registro Exitoso', `La misión ${newFlight.id} se ha guardado en la bitácora local.`);
+            
+            // Reset Form UI
+            e.target.reset();
+            document.getElementById('flight-date').valueAsDate = new Date();
+            durationDisplay.textContent = '0 min';
+            btnRemoveImg.click(); // Reset image
+            hasNoveltySelect.dispatchEvent(new Event('change')); // Hide novelty box
+            document.getElementById('ai-preflight-container').classList.add('hidden'); // Hide report
+            
+            updateDashboard();
+        });
+
+        function saveData() {
+            try {
+                localStorage.setItem('foxtrot_flights', JSON.stringify(flights));
+            } catch(e) {
+                if(e.name === 'QuotaExceededError') {
+                    showCustomModal('error', 'Almacenamiento Lleno', 'Se ha excedido la cuota de localStorage. Borra registros o imágenes viejas.');
+                    flights.shift(); // Revertir inserción
+                }
+            }
         }
 
-        function updateCharts() {
-            const counts = { 'Lineal': 0, 'Orbital': 0, 'Waypoints': 0 };
-            flightLogs.forEach(function(log) {
-                if (counts[log.type] !== undefined) {
-                    counts[log.type]++;
-                }
+
+        // --- 13. ACTUALIZACIÓN DEL DASHBOARD E HISTORIAL ---
+        function updateDashboard() {
+            // Stats
+            const total = flights.length;
+            const totalMins = flights.reduce((sum, f) => sum + (f.duration || 0), 0);
+            const maxWind = flights.reduce((max, f) => Math.max(max, f.wind || 0), 0);
+            const novelties = flights.filter(f => f.hasNovelty).length;
+            const noveltyRate = total > 0 ? Math.round((novelties / total) * 100) : 0;
+
+            document.getElementById('stat-total-flights').textContent = total;
+            document.getElementById('stat-total-duration').textContent = totalMins + ' min';
+            document.getElementById('stat-max-wind').textContent = maxWind + ' km/h';
+            document.getElementById('stat-novelty-rate').textContent = noveltyRate + '%';
+
+            // Render List
+            renderLogs();
+
+            // Render Chart
+            renderChart();
+        }
+
+        function renderLogs(filterText = '') {
+            const container = document.getElementById('logs-container');
+            container.innerHTML = '';
+
+            const filtered = flights.filter(f => {
+                const term = filterText.toLowerCase();
+                return f.opName.toLowerCase().includes(term) || 
+                       f.droneModel.toLowerCase().includes(term) ||
+                       f.location.toLowerCase().includes(term) ||
+                       f.id.toLowerCase().includes(term);
             });
 
+            if(filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-slate-500 text-sm py-8">
+                        <i class="fa-solid fa-plane-slash text-3xl mb-2 opacity-50"></i>
+                        <p>No se encontraron registros.</p>
+                    </div>`;
+                return;
+            }
+
+            filtered.forEach((flight, index) => {
+                const el = document.createElement('div');
+                el.className = `bg-navy-800/60 border border-navy-700 rounded-xl p-3 flex justify-between items-center hover:border-cyanAccent-500/50 cursor-pointer transition-all ${flight.hasNovelty ? 'border-l-4 border-l-rose-500' : 'border-l-4 border-l-emerald-500'}`;
+                el.onclick = () => showFlightDetail(flight);
+                
+                el.innerHTML = `
+                    <div class="flex flex-col gap-1 w-full">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-cyanAccent-400">${flight.id}</span>
+                            <span class="text-[10px] text-slate-400 font-mono">${flight.flightDate} | ${flight.startTime}</span>
+                        </div>
+                        <div class="text-sm font-semibold text-slate-200 truncate">${flight.droneModel} • ${flight.location}</div>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-[10px] text-slate-400"><i class="fa-solid fa-user text-slate-500 mr-1"></i>${flight.opName}</span>
+                            ${flight.hasNovelty ? '<span class="text-[10px] bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded font-bold">NOVEDAD</span>' : '<span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">NOMINAL</span>'}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        document.getElementById('search-bar').addEventListener('input', (e) => {
+            renderLogs(e.target.value);
+        });
+
+        // --- 14. GRÁFICOS (CHART.JS) ---
+        function renderChart() {
             const ctx = document.getElementById('typeChart').getContext('2d');
             
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
+            const typeCounts = { 'Lineal': 0, 'Orbital': 0, 'Waypoints': 0 };
+            flights.forEach(f => { if(typeCounts[f.type] !== undefined) typeCounts[f.type]++; });
+
+            if(chartInstance) chartInstance.destroy();
 
             chartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Vuelo Lineal', 'Vuelo Orbital', 'Waypoints'],
+                    labels: Object.keys(typeCounts),
                     datasets: [{
-                        data: [counts['Lineal'], counts['Orbital'], counts['Waypoints']],
-                        backgroundColor: ['#00bbf9', '#00f5d4', '#131b4e'],
-                        borderColor: '#0d133a',
-                        borderWidth: 2
+                        data: Object.values(typeCounts),
+                        backgroundColor: ['#00bbf9', '#3b5bf6', '#00f5d4'],
+                        borderWidth: 0,
+                        hoverOffset: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#94a3b8',
-                                font: {
-                                    family: 'Inter',
-                                    size: 11
-                                }
-                            }
-                        }
-                    }
+                        legend: { position: 'bottom', labels: { color: '#cbd5e1', font: { family: 'Inter', size: 10 } } }
+                    },
+                    cutout: '70%'
                 }
             });
         }
 
-        // --- 5. RENDERIZACIÓN DE LA BITÁCORA HISTÓRICA ---
-        const logsContainer = document.getElementById('logs-container');
-        const searchBar = document.getElementById('search-bar');
-
-        function renderLogs(filteredLogs) {
-            const logsToRender = typeof filteredLogs !== 'undefined' && filteredLogs !== null ? filteredLogs : flightLogs;
-            logsContainer.innerHTML = '';
-
-            if (logsToRender.length === 0) {
-                logsContainer.innerHTML = `
-                    <div class="text-center py-12 text-slate-500 border border-dashed border-navy-800 rounded-xl">
-                        <i class="fa-solid fa-ghost text-3xl mb-3"></i>
-                        <p class="text-sm">No se encontraron registros de vuelo en el sistema.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            // Ordenamos por fecha descendente (más recientes primero)
-            const sorted = [].concat(logsToRender).sort(function(a, b) {
-                return new Date(b.date + 'T' + b.startTime) - new Date(a.date + 'T' + a.startTime);
-            });
-
-            sorted.forEach(function(log) {
-                const noveltyBadge = log.hasNovelty === 'yes' 
-                    ? `<span class="bg-rose-500/15 border border-rose-500/30 text-rose-400 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Novedad</span>`
-                    : `<span class="bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-shield mr-1"></i>Limpio</span>`;
-
-                const typeIcon = log.type === 'Lineal' ? 'fa-arrow-trend-up' : log.type === 'Orbital' ? 'fa-arrows-spin' : 'fa-location-dot';
-
-                const logEl = document.createElement('div');
-                logEl.className = "bg-navy-800/40 border border-navy-800 hover:border-navy-700 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all hover:bg-navy-800/60";
-                logEl.innerHTML = `
-                    <div class="flex items-start gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-navy-800 flex items-center justify-center text-cyanAccent-400 text-sm border border-navy-700 shrink-0">
-                            <i class="fa-solid ${typeIcon}"></i>
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <h4 class="font-bold text-slate-100 text-sm">${log.operator}</h4>
-                                <span class="text-xs text-slate-400 font-mono font-medium">Legajo: ${log.legajo}</span>
-                                ${noveltyBadge}
-                            </div>
-                            <p class="text-xs text-slate-300 mt-1">
-                                <span class="font-semibold text-cyanAccent-500">${log.droneModel}</span> &bull; <span>${log.location}</span>
-                            </p>
-                            <p class="text-[10px] text-slate-500 mt-1 font-medium uppercase tracking-wide">
-                                <i class="fa-regular fa-calendar mr-1"></i>${log.date} &bull; <i class="fa-regular fa-clock mr-1"></i>${log.startTime} - ${log.endTime} (${log.duration} min)
-                            </p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 w-full md:w-auto justify-end">
-                        <button onclick="viewDetails('${log.id}')" class="text-xs font-semibold bg-navy-800 hover:bg-navy-700 text-cyanAccent-400 hover:text-cyanAccent-500 px-3 py-1.5 rounded-lg border border-navy-700 transition-all w-full md:w-auto text-center">
-                            Ver Detalles
-                        </button>
-                        <button onclick="deleteLog('${log.id}')" class="text-xs font-semibold hover:bg-rose-950/40 text-rose-400 hover:text-rose-500 p-1.5 rounded-lg border border-transparent hover:border-rose-500/20 transition-all" title="Eliminar del sistema">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-                `;
-                logsContainer.appendChild(logEl);
-            });
-        }
-
-        // Buscador reactivo
-        searchBar.addEventListener('input', function(e) {
-            const query = e.target.value.toLowerCase().trim();
-            if (query === '') {
-                renderLogs();
-                return;
-            }
-
-            const filtered = flightLogs.filter(function(log) {
-                return log.operator.toLowerCase().indexOf(query) !== -1 ||
-                    log.legajo.toLowerCase().indexOf(query) !== -1 ||
-                    log.droneModel.toLowerCase().indexOf(query) !== -1 ||
-                    log.location.toLowerCase().indexOf(query) !== -1 ||
-                    log.type.toLowerCase().indexOf(query) !== -1 ||
-                    log.dni.toLowerCase().indexOf(query) !== -1;
-            });
-            renderLogs(filtered);
-        });
-
-        // --- 6. ACCIONES: AGREGAR, VER DETALLES Y ELIMINAR REGISTROS ---
-        const form = document.getElementById('flight-form');
-
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const opName = document.getElementById('op-name').value;
-            const opDni = document.getElementById('op-dni').value;
-            const opLegajo = document.getElementById('op-legajo').value;
-            const flightDate = document.getElementById('flight-date').value;
-            const flightStart = document.getElementById('flight-start').value;
-            const flightEnd = document.getElementById('flight-end').value;
-            const flightLocation = document.getElementById('flight-location').value;
-            const flightWind = parseFloat(document.getElementById('flight-wind').value);
-            const flightAltitude = parseInt(document.getElementById('flight-altitude').value);
-            const flightType = document.getElementById('flight-type').value;
-            const dronModel = document.getElementById('dron-model').value;
-            const dronSN = document.getElementById('dron-sn').value;
-            const batInitial = parseInt(document.getElementById('bat-initial').value);
-            const batFinal = parseInt(document.getElementById('bat-final').value);
-            const hasNovelty = document.getElementById('has-novelty').value;
-            const noveltyDesc = document.getElementById('novelty-desc').value;
-            const preliminaryAnalysis = document.getElementById('preliminary-analysis').value;
-
-            // Validación de Consumo de Batería con Diálogo de Seguridad de Aviación
-            if (batFinal > batInitial) {
-                showCustomAlert("Error en Parámetros", "El porcentaje de batería final no puede superar el nivel inicial bajo condiciones de vuelo convencionales.", "warning");
-                return;
-            }
-
-            const calculatedMinutes = calculateDuration();
-
-            const newLog = {
-                id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15),
-                operator: opName,
-                dni: opDni,
-                legajo: opLegajo,
-                date: flightDate,
-                startTime: flightStart,
-                endTime: flightEnd,
-                duration: calculatedMinutes,
-                location: flightLocation,
-                wind: flightWind,
-                altitude: flightAltitude,
-                type: flightType,
-                droneModel: dronModel,
-                droneSN: dronSN,
-                batInitial: batInitial,
-                batFinal: batFinal,
-                hasNovelty: hasNovelty,
-                noveltyDesc: noveltyDesc,
-                image: currentImageBase64 || "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&q=80&w=600",
-                analysis: preliminaryAnalysis
-            };
-
-            flightLogs.push(newLog);
-            saveLogsToStorage();
-            
-            // Refrescar Interfaz
-            updateDashboardMetrics();
-            updateCharts();
-            renderLogs();
-            
-            // Integración con Google Sheets
-            const sheetsUrl = document.getElementById('sheets-url').value;
-            if (sheetsUrl && sheetsUrl.trim() !== '') {
-                sendToSheets(newLog, function() {
-                    showCustomAlert("✅ Sincronizado con Google Sheets", "El registro fue guardado en la bitácora local Y enviado exitosamente a tu Google Sheet en la nube.", "success");
-                });
-            }
-
-            // Reiniciar Formulario
-            form.reset();
-            currentImageBase64 = null;
-            previewImg.src = '#';
-            previewContainer.classList.add('hidden');
-            dropzone.classList.remove('hidden');
-            noveltyContainer.classList.add('hidden');
-            durationDisplay.textContent = "0 min";
-            closePreflightCheck();
-            
-            // Establecer fecha de hoy como predeterminada
-            document.getElementById('flight-date').valueAsDate = new Date();
-
-            const sheetsUrlCheck = document.getElementById('sheets-url').value;
-            if (!sheetsUrlCheck || sheetsUrlCheck.trim() === '') {
-                showCustomAlert("Bitácora Guardada", "La operación del vector se ha archivado localmente. Configura la URL de Google Sheets en el encabezado para sincronizar con la nube.", "success");
-            }
-        });
-
-        // Ver Detalle Detallado en el Modal
-        const modal = document.getElementById('detail-modal');
+        // --- 15. MODAL DE DETALLES ---
+        const detailModal = document.getElementById('detail-modal');
         const modalContent = document.getElementById('modal-content');
-        const closeModal = document.getElementById('close-modal');
 
-        window.viewDetails = function(id) {
-            const log = flightLogs.find(function(item) { return item.id === id; });
-            if (!log) return;
-
-            const noveltyInfo = log.hasNovelty === 'yes'
-                ? `
-                    <div class="bg-rose-950/30 border border-rose-500/30 rounded-xl p-4 mt-3">
-                        <h4 class="text-sm font-bold text-rose-400 mb-1 uppercase tracking-wide flex items-center gap-1.5">
-                            <i class="fa-solid fa-triangle-exclamation"></i> Alerta Registrada
-                        </h4>
-                        <p class="text-xs text-slate-300">${log.noveltyDesc}</p>
-                    </div>
-                `
-                : `
-                    <div class="bg-emerald-950/20 border border-emerald-500/20 rounded-xl p-3 mt-3">
-                        <p class="text-xs text-emerald-400 flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-check"></i> Vuelo seguro. Sin novedades estructurales o mecánicas.
-                        </p>
-                    </div>
-                `;
-
+        function showFlightDetail(flight) {
             modalContent.innerHTML = `
-                <div class="border-b border-navy-800 pb-4">
-                    <span class="text-xs font-bold text-cyanAccent-400 uppercase tracking-widest font-mono">Reporte Técnico Operativo</span>
-                    <h3 class="text-xl font-black text-slate-100 mt-1">${log.operator}</h3>
-                    <p class="text-xs text-slate-400">Legajo: ${log.legajo} &bull; Documento: ${log.dni}</p>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div class="space-y-4">
-                        <h4 class="text-xs font-bold text-cyanAccent-500 uppercase tracking-widest border-b border-navy-800 pb-1">Logística de Misión</h4>
-                        <div class="grid grid-cols-2 gap-3 text-xs">
-                            <div>
-                                <span class="text-slate-500 block">Fecha:</span>
-                                <span class="font-medium text-slate-200">${log.date}</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-500 block">Ubicación:</span>
-                                <span class="font-medium text-slate-200">${log.location}</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-500 block">Hora Ventana:</span>
-                                <span class="font-medium text-slate-200">${log.startTime} - ${log.endTime}</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-500 block">Duración de Vuelo:</span>
-                                <span class="font-medium text-cyanAccent-400 font-bold">${log.duration} minutos</span>
-                            </div>
-                        </div>
-
-                        <h4 class="text-xs font-bold text-cyanAccent-500 uppercase tracking-widest border-b border-navy-800 pb-1 pt-2">Parámetros de Navegación</h4>
-                        <div class="grid grid-cols-2 gap-3 text-xs">
-                            <div>
-                                <span class="text-slate-500 block">Tipo de Vuelo:</span>
-                                <span class="font-medium text-slate-200">${log.type}</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-500 block">Viento Registrado:</span>
-                                <span class="font-medium text-slate-200 font-mono">${log.wind} km/h</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-500 block">Altura de Operación:</span>
-                                <span class="font-medium text-slate-200 font-mono">${log.altitude} metros</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-500 block">Consumo de Energía:</span>
-                                <span class="font-medium text-slate-200 font-mono">${log.batInitial}% &rarr; ${log.batFinal}%</span>
-                            </div>
-                        </div>
+                <div class="flex justify-between items-start border-b border-navy-800 pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-100 uppercase tracking-wider text-cyanAccent-400">Reporte de Misión: ${flight.id}</h2>
+                        <p class="text-xs text-slate-400">Archivado: ${new Date(flight.dateStr).toLocaleString()}</p>
                     </div>
-
-                    <div class="space-y-4">
-                        <h4 class="text-xs font-bold text-cyanAccent-500 uppercase tracking-widest border-b border-navy-800 pb-1">Vectores y Equipos</h4>
-                        <div class="grid grid-cols-2 gap-3 text-xs">
-                            <div class="col-span-2">
-                                <span class="text-slate-500 block">Aeronave (Modelo):</span>
-                                <span class="font-bold text-cyanAccent-400">${log.droneModel}</span>
-                            </div>
-                            <div class="col-span-2">
-                                <span class="text-slate-500 block">Número de Serie (S/N):</span>
-                                <span class="font-mono text-slate-300 text-xs">${log.droneSN}</span>
-                            </div>
+                    <button onclick="deleteFlight('${flight.id}')" class="bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 px-3 py-1 rounded text-xs font-bold transition-all">
+                        <i class="fa-solid fa-trash-can"></i> Eliminar
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
+                    <div class="space-y-3">
+                        <div><strong class="text-xs text-slate-500 block">Operador</strong><span class="text-sm">${flight.opName} (Leg: ${flight.opLegajo})</span></div>
+                        <div><strong class="text-xs text-slate-500 block">Ubicación y Tiempo</strong><span class="text-sm">${flight.location} <br> ${flight.flightDate} de ${flight.startTime} a ${flight.endTime} (${flight.duration}m)</span></div>
+                        <div><strong class="text-xs text-slate-500 block">Aeronave</strong><span class="text-sm">${flight.droneModel} (S/N: ${flight.droneSn})</span></div>
+                        <div><strong class="text-xs text-slate-500 block">Condiciones</strong><span class="text-sm">Viento: ${flight.wind} km/h | Altura: ${flight.altitude}m | Tipo: ${flight.type}</span></div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-navy-800 rounded-lg">
+                            <strong class="text-xs text-slate-500 block mb-1">Estado de la Misión</strong>
+                            ${flight.hasNovelty 
+                                ? `<span class="text-rose-400 font-bold text-sm"><i class="fa-solid fa-triangle-exclamation"></i> Con Novedades</span><p class="text-xs mt-1 border-l-2 border-rose-500 pl-2 text-slate-300">${flight.noveltyDesc}</p>` 
+                                : `<span class="text-emerald-400 font-bold text-sm"><i class="fa-solid fa-check-circle"></i> Nominal Completada</span>`
+                            }
                         </div>
-
-                        <div>
-                            <span class="text-xs text-slate-500 block mb-1">Evidencia / Captura:</span>
-                            <div class="rounded-lg overflow-hidden border border-navy-800 shadow-md">
-                                <img src="${log.image}" alt="Captura de drone" class="w-full h-32 object-cover">
-                            </div>
-                        </div>
+                        ${flight.analysis ? `
+                        <div class="p-3 bg-navy-800 rounded-lg">
+                            <strong class="text-xs text-slate-500 block mb-1">Análisis IA Guardado</strong>
+                            <p class="text-xs text-slate-300 italic">${flight.analysis}</p>
+                        </div>` : ''}
                     </div>
                 </div>
 
-                <div class="pt-2">
-                    <h4 class="text-xs font-bold text-cyanAccent-500 uppercase tracking-widest border-b border-navy-800 pb-1">Análisis Técnico Preliminar</h4>
-                    <p class="text-xs text-slate-300 mt-2 italic leading-relaxed bg-navy-950/40 p-3 rounded-xl border border-navy-800">"${log.analysis || 'Sin análisis preliminar registrado por el operador.'}"</p>
-                    ${noveltyInfo}
-                </div>
+                ${flight.image ? `
+                <div class="mt-4">
+                    <strong class="text-xs text-slate-500 block mb-2">Evidencia Visual</strong>
+                    <img src="${flight.image}" alt="Evidencia" class="w-full max-h-64 object-cover rounded-lg border border-navy-700">
+                </div>` : ''}
             `;
-            modal.classList.remove('hidden');
+            
+            detailModal.classList.remove('hidden');
+            setTimeout(() => {
+                detailModal.classList.remove('opacity-0');
+                detailModal.firstElementChild.classList.remove('scale-95');
+            }, 10);
+        }
+
+        document.getElementById('close-modal').addEventListener('click', () => {
+            detailModal.classList.add('opacity-0');
+            detailModal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => { detailModal.classList.add('hidden'); }, 300);
+        });
+
+        // Hacer global la función de borrar
+        window.deleteFlight = (id) => {
+            showCustomModal('info', 'Confirmar Eliminación', `¿Está seguro de eliminar el registro ${id}?`, (confirmed) => {
+                if(confirmed) {
+                    flights = flights.filter(f => f.id !== id);
+                    saveData();
+                    updateDashboard();
+                    document.getElementById('close-modal').click();
+                }
+            });
         };
 
-        closeModal.addEventListener('click', function() {
-            modal.classList.add('hidden');
-        });
-
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                modal.classList.add('hidden');
-            }
-        });
-
-        // Eliminar Registro con Confirmación Personalizada (No Alert)
-        window.deleteLog = function(id) {
-            showCustomAlert(
-                "¿Eliminar Registro Técnico?", 
-                "Esta acción es irreversible y eliminará de manera permanente esta bitácora del historial de operaciones locales.", 
-                "warning", 
-                function() {
-                    flightLogs = flightLogs.filter(function(item) { return item.id !== id; });
-                    saveLogsToStorage();
-                    updateDashboardMetrics();
-                    updateCharts();
-                    renderLogs();
-                    showCustomAlert("Registro Removido", "El reporte ha sido eliminado del sistema satisfactoriamente.", "success");
-                }, 
-                true
-            );
-        };
-
-        // --- FUNCIÓN CENTRAL DE ENVÍO A GOOGLE SHEETS ---
-        function sendToSheets(logObject, onSuccessCallback) {
-            const sheetsUrl = document.getElementById('sheets-url').value;
-            if (!sheetsUrl || sheetsUrl.trim() === '') return;
-
-            const payload = Object.assign({}, logObject);
-            // Truncar imagen base64 grande (límite de Google Sheets: 50k chars/celda)
-            if (payload.image && payload.image.startsWith('data:image') && payload.image.length > 49000) {
-                payload.image = "[Imagen adjunta localmente - demasiado grande para exportar a Sheets]";
-            }
-
-            fetch(sheetsUrl.trim(), {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(function(response) {
-                if (!response.ok) {
-                    throw new Error("HTTP " + response.status + ": " + response.statusText);
-                }
-                return response.json();
-            })
-            .then(function(data) {
-                console.log("Registro enviado a Sheets:", data);
-                if (onSuccessCallback) onSuccessCallback();
-            })
-            .catch(function(error) {
-                console.error("Error enviando a Google Sheets:", error);
-                showCustomAlert("Error de Sincronización", "No se pudo conectar con Google Sheets. Verifica que:\n• La URL del Apps Script sea correcta\n• El proyecto esté desplegado como 'Ejecutar como' tu usuario\n• Los permisos sean 'Ejecutar como: Tu usuario' y 'Quién tiene acceso: Cualquiera'\n• El navegador tenga conexión a Internet.", "error");
-            });
-        }
-
-        // --- FUNCIÓN CENTRAL DE LECTURA DESDE GOOGLE SHEETS ---
-        function loadFromSheets(onSuccessCallback) {
-            const sheetsUrl = document.getElementById('sheets-url').value;
-            if (!sheetsUrl || sheetsUrl.trim() === '') return;
-
-            const btnSyncSheets = document.getElementById('btn-sync-sheets');
-            const originalHtml = btnSyncSheets ? btnSyncSheets.innerHTML : '';
-            if (btnSyncSheets) {
-                btnSyncSheets.disabled = true;
-                btnSyncSheets.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Cargando...';
-            }
-
-            // Petición GET al Apps Script Web App con timeout
-            const controller = new AbortController();
-            const timeout = setTimeout(function() { controller.abort(); }, 10000); // 10 segundos timeout
-
-            fetch(sheetsUrl.trim(), { signal: controller.signal })
-            .then(function(res) {
-                clearTimeout(timeout);
-                if (!res.ok) {
-                    throw new Error("HTTP " + res.status + ": " + res.statusText);
-                }
-                return res.json();
-            })
-            .then(function(data) {
-                if (Array.isArray(data)) {
-                    // Validar que los elementos sean registros válidos
-                    const validLogs = data.filter(function(item) {
-                        return item && typeof item === 'object' && item.id && item.operator;
-                    });
-                    
-                    if (validLogs.length === 0) {
-                        throw new Error("Los registros recibidos no tienen la estructura correcta.");
-                    }
-                    
-                    // Si el servidor devolvió un array de registros, actualizamos el estado
-                    flightLogs = validLogs;
-                    saveLogsToStorage();
-                    updateDashboardMetrics();
-                    updateCharts();
-                    renderLogs();
-                    console.log("Cargados " + validLogs.length + " registros desde Google Sheets.");
-                    if (onSuccessCallback) onSuccessCallback();
-                } else if (data && data.status === "error") {
-                    throw new Error("Apps Script error: " + (data.message || "desconocido"));
-                } else if (data && data.length === 0) {
-                    console.log("Google Sheets está vacío, manteniendo datos locales.");
-                    if (onSuccessCallback) onSuccessCallback();
-                } else {
-                    throw new Error("Respuesta inesperada del servidor: " + JSON.stringify(data).substring(0, 100));
-                }
-            })
-            .catch(function(error) {
-                clearTimeout(timeout);
-                console.error("Error al obtener datos de Google Sheets:", error);
-                
-                // Determinar el tipo de error
-                let errorMsg = "No se pudo cargar el historial desde Google Sheets.";
-                if (error.name === 'AbortError') {
-                    errorMsg = "La solicitud expiró. El servidor tardó demasiado en responder. Intenta de nuevo.";
-                } else if (error.message.includes("Failed to fetch")) {
-                    errorMsg = "Error de red. Verifica tu conexión a Internet y que la URL sea accesible.";
-                } else if (error.message.includes("HTTP")) {
-                    errorMsg = "Error del servidor: " + error.message + ". Verifica que el Apps Script esté correctamente desplegado.";
-                }
-                
-                showCustomAlert("Error de Sincronización", errorMsg, "error");
-                // Si falla la red o el CORS, mantenemos el localStorage por seguridad
-            })
-            .finally(function() {
-                if (btnSyncSheets) {
-                    btnSyncSheets.disabled = false;
-                    btnSyncSheets.innerHTML = originalHtml;
-                }
-            });
-        }
-
-        // --- BOTÓN: SINCRONIZAR TODOS LOS REGISTROS LOCALES A SHEETS ---
-        const btnSyncSheets = document.getElementById('btn-sync-sheets');
-        if (btnSyncSheets) {
-            btnSyncSheets.addEventListener('click', function() {
-                const sheetsUrl = document.getElementById('sheets-url').value;
-                if (!sheetsUrl || sheetsUrl.trim() === '') {
-                    showCustomAlert("URL Requerida", "Por favor ingresa la URL de tu Google Apps Script en el campo de encabezado antes de sincronizar.", "warning");
-                    return;
-                }
-                
-                showCustomAlert(
-                    "Sincronización de Bitácora",
-                    "¿Qué acción deseas realizar?",
-                    "info",
-                    function() {
-                        // Acción predeterminada: Cargar desde Sheets (Importar)
-                        loadFromSheets(function() {
-                            showCustomAlert("Bitácora Actualizada", "Los datos se han sincronizado desde Google Sheets correctamente.", "success");
-                        });
-                    }
-                );
-                
-                // Modificar dinámicamente los botones del alert para dar opciones claras
-                const btnsContainer = document.getElementById('alert-buttons-container');
-                if (btnsContainer) {
-                    btnsContainer.innerHTML = '';
-                    
-                    const cancelBtn = document.createElement('button');
-                    cancelBtn.className = "bg-navy-800 hover:bg-navy-700 text-slate-300 border border-navy-700 font-semibold px-3 py-1.5 rounded-lg text-xs transition-all";
-                    cancelBtn.textContent = "Cancelar";
-                    cancelBtn.onclick = function() { document.getElementById('custom-alert-modal').classList.add('hidden'); };
-                    btnsContainer.appendChild(cancelBtn);
-
-                    const pullBtn = document.createElement('button');
-                    pullBtn.className = "bg-sky-600 hover:bg-sky-500 text-white font-semibold px-3 py-1.5 rounded-lg text-xs transition-all";
-                    pullBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Traer de la Nube';
-                    pullBtn.onclick = function() {
-                        document.getElementById('custom-alert-modal').classList.add('hidden');
-                        loadFromSheets(function() {
-                            showCustomAlert("Éxito", "Historial actualizado desde Google Sheets en tiempo real.", "success");
-                        });
-                    };
-                    btnsContainer.appendChild(pullBtn);
-
-                    const pushBtn = document.createElement('button');
-                    pushBtn.className = "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3 py-1.5 rounded-lg text-xs transition-all";
-                    pushBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Enviar Locales a Nube';
-                    pushBtn.onclick = function() {
-                        document.getElementById('custom-alert-modal').classList.add('hidden');
-                        if (flightLogs.length === 0) {
-                            showCustomAlert("Sin Registros", "No hay registros locales para sincronizar.", "warning");
-                            return;
-                        }
-                        btnSyncSheets.disabled = true;
-                        btnSyncSheets.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Enviando...';
-
-                        let sent = 0;
-                        flightLogs.forEach(function(log) {
-                            sendToSheets(log);
-                            sent++;
-                        });
-
-                        setTimeout(function() {
-                            btnSyncSheets.disabled = false;
-                            btnSyncSheets.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Sincronizar Todo';
-                            showCustomAlert(
-                                "Sincronización Enviada",
-                                sent + " registro(s) local(es) fueron enviados a Google Sheets.",
-                                "success"
-                            );
-                        }, sent * 300 + 500);
-                    };
-                    btnsContainer.appendChild(pushBtn);
-                }
-            });
-        }
-
-        // Exportación de datos como JSON
-        const btnExport = document.getElementById('btn-export');
-        btnExport.addEventListener('click', function() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(flightLogs, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "foxtrot_sky_eye_export_" + new Date().toISOString().split('T')[0] + ".json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        });
-
-        // --- 7. CARGA DE SISTEMA ---
-        window.onload = function () {
-            loadLogs();
-            updateDashboardMetrics();
-            updateCharts();
-            renderLogs();
+        // --- 16. EXPORTAR A JSON ---
+        document.getElementById('btn-export').addEventListener('click', () => {
+            if(flights.length === 0) return showCustomModal('info', 'Archivo Vacío', 'No hay registros para exportar.');
             
-            // Colocar por defecto la fecha del día actual
-            document.getElementById('flight-date').valueAsDate = new Date();
-            
-            // Cargar Sheets URL si existe
-            const sheetsUrlInput = document.getElementById('sheets-url');
-            if (sheetsUrlInput) {
-                const savedUrl = localStorage.getItem('foxtrot_sheets_url');
-                if (savedUrl) {
-                    sheetsUrlInput.value = savedUrl;
-                    // Intentar cargar dinámicamente desde Sheets en segundo plano al iniciar
-                    setTimeout(function() {
-                        loadFromSheets();
-                    }, 500);
-                }
+            // Remover imágenes en base64 para evitar archivos JSON gigantescos
+            const exportData = flights.map(f => {
+                const { image, ...rest } = f;
+                return rest;
+            });
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `UAS_Logbook_${new Date().toISOString().split('T')[0]}.json`);
+            dlAnchorElem.click();
+        });
+
+        // --- 17. SINCRONIZACIÓN GOOGLE SHEETS (MOCK/FETCH) ---
+        document.getElementById('btn-sync-sheets').addEventListener('click', async () => {
+            const url = document.getElementById('sheets-url').value;
+            if(!url || !url.includes('script.google.com')) return showCustomModal('error', 'URL Inválida', 'Ingrese una URL de Google Apps Script válida.');
+            if(flights.length === 0) return showCustomModal('info', 'Archivo Vacío', 'No hay registros locales para sincronizar.');
+
+            const btn = document.getElementById('btn-sync-sheets');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sincronizando...';
+            btn.disabled = true;
+
+            try {
+                // Al enviar a Google Apps Script Web App a menudo se requieren configs de CORS específicas.
+                // Aquí usamos 'no-cors' como fallback estándar asumiendo que el script maneja POST correctamente.
+                // En un entorno de producción, la validación final depende del Apps Script (.gs)
                 
-                sheetsUrlInput.addEventListener('change', function() {
-                    localStorage.setItem('foxtrot_sheets_url', this.value);
-                    loadFromSheets();
+                // Reducimos peso removiendo base64
+                const payload = flights.map(f => { const {image, ...r} = f; return r; });
+
+                await fetch(url, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
+
+                showCustomModal('success', 'Sincronización Enviada', 'Los datos se enviaron a la hoja de cálculo. (Nota: por políticas de CORS, el estado final depende del script de Google).');
+            } catch (err) {
+                console.error(err);
+                showCustomModal('error', 'Fallo de Red', 'No se pudo conectar con el servidor de Google Sheets.');
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
             }
-        };
+        });
+
+        // Inicialización al cargar
+        updateDashboard();
+
     </script>
 </body>
 </html>
