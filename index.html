@@ -1341,17 +1341,22 @@
 
             fetch(sheetsUrl.trim(), {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             })
-            .then(function() {
-                // Con mode: 'no-cors' siempre llegamos aquí si la red funciona
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error("HTTP " + response.status + ": " + response.statusText);
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                console.log("Registro enviado a Sheets:", data);
                 if (onSuccessCallback) onSuccessCallback();
             })
             .catch(function(error) {
                 console.error("Error enviando a Google Sheets:", error);
-                showCustomAlert("Error de Sincronización", "No se pudo conectar con Google Sheets. Verifica que la URL del Apps Script sea correcta y que esté configurada como 'Cualquiera' en los permisos.", "error");
+                showCustomAlert("Error de Sincronización", "No se pudo conectar con Google Sheets. Verifica que:\n• La URL del Apps Script sea correcta\n• El proyecto esté desplegado como 'Ejecutar como' tu usuario\n• Los permisos sean 'Ejecutar como: Tu usuario' y 'Quién tiene acceso: Cualquiera'\n• El navegador tenga conexión a Internet.", "error");
             });
         }
 
@@ -1367,27 +1372,61 @@
                 btnSyncSheets.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Cargando...';
             }
 
-            // Petición GET al Apps Script Web App
-            fetch(sheetsUrl.trim())
+            // Petición GET al Apps Script Web App con timeout
+            const controller = new AbortController();
+            const timeout = setTimeout(function() { controller.abort(); }, 10000); // 10 segundos timeout
+
+            fetch(sheetsUrl.trim(), { signal: controller.signal })
             .then(function(res) {
-                if (!res.ok) throw new Error("HTTP Status " + res.status);
+                clearTimeout(timeout);
+                if (!res.ok) {
+                    throw new Error("HTTP " + res.status + ": " + res.statusText);
+                }
                 return res.json();
             })
             .then(function(data) {
                 if (Array.isArray(data)) {
+                    // Validar que los elementos sean registros válidos
+                    const validLogs = data.filter(function(item) {
+                        return item && typeof item === 'object' && item.id && item.operator;
+                    });
+                    
+                    if (validLogs.length === 0) {
+                        throw new Error("Los registros recibidos no tienen la estructura correcta.");
+                    }
+                    
                     // Si el servidor devolvió un array de registros, actualizamos el estado
-                    flightLogs = data;
+                    flightLogs = validLogs;
                     saveLogsToStorage();
                     updateDashboardMetrics();
                     updateCharts();
                     renderLogs();
+                    console.log("Cargados " + validLogs.length + " registros desde Google Sheets.");
                     if (onSuccessCallback) onSuccessCallback();
                 } else if (data && data.status === "error") {
-                    console.error("Error devuelto por Apps Script:", data.message);
+                    throw new Error("Apps Script error: " + (data.message || "desconocido"));
+                } else if (data && data.length === 0) {
+                    console.log("Google Sheets está vacío, manteniendo datos locales.");
+                    if (onSuccessCallback) onSuccessCallback();
+                } else {
+                    throw new Error("Respuesta inesperada del servidor: " + JSON.stringify(data).substring(0, 100));
                 }
             })
             .catch(function(error) {
+                clearTimeout(timeout);
                 console.error("Error al obtener datos de Google Sheets:", error);
+                
+                // Determinar el tipo de error
+                let errorMsg = "No se pudo cargar el historial desde Google Sheets.";
+                if (error.name === 'AbortError') {
+                    errorMsg = "La solicitud expiró. El servidor tardó demasiado en responder. Intenta de nuevo.";
+                } else if (error.message.includes("Failed to fetch")) {
+                    errorMsg = "Error de red. Verifica tu conexión a Internet y que la URL sea accesible.";
+                } else if (error.message.includes("HTTP")) {
+                    errorMsg = "Error del servidor: " + error.message + ". Verifica que el Apps Script esté correctamente desplegado.";
+                }
+                
+                showCustomAlert("Error de Sincronización", errorMsg, "error");
                 // Si falla la red o el CORS, mantenemos el localStorage por seguridad
             })
             .finally(function() {
