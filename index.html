@@ -1287,8 +1287,7 @@ Indica si hay zonas prohibidas (aeropuertos cercanos, prisiones, militares), el 
                 console.log('Solicitando datos desde Google Sheets...');
                 
                 const response = await fetch(url, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
+                    method: 'GET'
                 });
 
                 if(!response.ok) {
