@@ -391,6 +391,10 @@
                             <p class="text-[10px] text-slate-400">Registros persistentes en este dispositivo.</p>
                         </div>
                         <div class="flex items-center gap-2">
+                            <button id="btn-import-trigger" class="bg-navy-800 hover:bg-navy-700 border border-navy-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all" title="Importar vuelos desde archivo local (JSON/CSV)">
+                                <i class="fa-solid fa-file-import"></i> Importar
+                            </button>
+                            <input type="file" id="btn-import-file" accept=".json,.csv" class="hidden">
                             <button id="btn-export" class="bg-navy-800 hover:bg-navy-700 border border-navy-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all">
                                 <i class="fa-solid fa-file-export"></i> JSON
                             </button>
@@ -1026,6 +1030,156 @@ Indica si hay zonas prohibidas (aeropuertos cercanos, prisiones, militares), el 
             dlAnchorElem.click();
         });
 
+        // --- 16.5 IMPORTAR DESDE JSON O CSV ---
+        const btnImportTrigger = document.getElementById('btn-import-trigger');
+        const btnImportFile = document.getElementById('btn-import-file');
+
+        btnImportTrigger.addEventListener('click', () => {
+            btnImportFile.click();
+        });
+
+        btnImportFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const text = event.target.result;
+                    let importedFlights = [];
+
+                    if (file.name.endsWith('.json')) {
+                        importedFlights = importJSON(text);
+                    } else if (file.name.endsWith('.csv')) {
+                        importedFlights = importCSV(text);
+                    } else {
+                        throw new Error("Formato de archivo no soportado. Use .json o .csv.");
+                    }
+
+                    if (importedFlights.length === 0) {
+                        throw new Error("No se encontraron registros válidos para importar.");
+                    }
+
+                    // Confirmar importación
+                    showCustomModal('info', 'Confirmar Importación', 
+                        `Se encontraron ${importedFlights.length} vuelos en ${file.name}. ¿Deseas añadirlos a los registros locales existentes? (Si eliges Cancelar, se reemplazarán por completo los datos actuales)`,
+                        (merge) => {
+                            if (merge) {
+                                // Combinar evitando duplicados por ID si ya existen
+                                const existingIds = new Set(flights.map(f => f.id));
+                                const newUnique = importedFlights.filter(f => !existingIds.has(f.id));
+                                flights = [...newUnique, ...flights];
+                            } else {
+                                // Reemplazar los datos actuales por los importados
+                                flights = importedFlights;
+                            }
+                            saveData();
+                            updateDashboard();
+                            showCustomModal('success', 'Importación Exitosa', `Se han importado ${importedFlights.length} vuelos correctamente.`);
+                        }
+                    );
+
+                } catch (err) {
+                    console.error(err);
+                    showCustomModal('error', 'Error de Importación', err.message);
+                } finally {
+                    // Reset input
+                    btnImportFile.value = '';
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function parseCSV(text) {
+            const lines = [];
+            let row = [""];
+            let inQuotes = false;
+
+            for (let i = 0; i < text.length; i++) {
+                let c = text[i];
+                let next = text[i+1];
+                if (c === '"') {
+                    if (inQuotes && next === '"') {
+                        row[row.length - 1] += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (c === ',' && !inQuotes) {
+                    row.push('');
+                } else if ((c === '\r' || c === '\n') && !inQuotes) {
+                    if (c === '\r' && next === '\n') { i++; }
+                    lines.push(row);
+                    row = [''];
+                } else {
+                    row[row.length - 1] += c;
+                }
+            }
+            if (row.length > 1 || row[0] !== '') {
+                lines.push(row);
+            }
+            return lines;
+        }
+
+        function importCSV(text) {
+            const rows = parseCSV(text);
+            if (rows.length < 2) throw new Error("El archivo CSV está vacío o no tiene el formato correcto.");
+            
+            const headers = rows[0].map(h => h.trim());
+            const imported = [];
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (row.length < headers.length) continue; // Salta líneas incompletas
+                
+                const flight = {};
+                headers.forEach((header, index) => {
+                    let val = row[index];
+                    if (val === undefined) val = "";
+                    
+                    if (header === "wind" || header === "duration") {
+                        flight[header] = parseFloat(val) || 0;
+                    } else if (header === "batInitial" || header === "batFinal" || header === "altitude") {
+                        flight[header] = parseInt(val, 10) || 0;
+                    } else if (header === "hasNovelty") {
+                        flight[header] = val.toLowerCase() === "true";
+                    } else {
+                        flight[header] = val;
+                    }
+                });
+
+                if (!flight.id) {
+                    flight.id = `UAS-${Math.floor(1000 + Math.random() * 9000)}`;
+                }
+                if (!flight.dateStr) {
+                    flight.dateStr = new Date().toISOString();
+                }
+
+                imported.push(flight);
+            }
+            return imported;
+        }
+
+        function importJSON(text) {
+            const data = JSON.parse(text);
+            const list = Array.isArray(data) ? data : [data];
+            
+            list.forEach(flight => {
+                if (!flight.opName) {
+                    throw new Error("El archivo JSON no contiene registros válidos (falta 'opName').");
+                }
+                if (!flight.id) {
+                    flight.id = `UAS-${Math.floor(1000 + Math.random() * 9000)}`;
+                }
+                if (!flight.dateStr) {
+                    flight.dateStr = new Date().toISOString();
+                }
+                if (flight.wind !== undefined) flight.wind = parseFloat(flight.wind) || 0;
+                if (flight.duration !== undefined) flight.duration = parseFloat(flight.duration) || 0;
+            });
+            return list;
+        }
+
         // --- 17. SINCRONIZACIÓN GOOGLE SHEETS (MEJORADA) ---
         async function syncToGoogleSheets() {
             const url = document.getElementById('sheets-url').value.trim();
@@ -1056,35 +1210,20 @@ Indica si hay zonas prohibidas (aeropuertos cercanos, prisiones, militares), el 
                     return flightCopy;
                 });
 
-                console.log(`Enviando ${flights.length} registros a Google Sheets...`);
-                
-                // Fetch SIN mode: 'no-cors' para poder leer la respuesta correctamente
-                const response = await fetch(url, {
+                // Enviamos con mode: 'no-cors' para evitar bloqueos de CORS en el navegador.
+                // Esto asegura que la solicitud sea despachada correctamente al servidor de Google.
+                await fetch(url, {
                     method: 'POST',
+                    mode: 'no-cors',
                     headers: { 
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'text/plain',
                     },
                     body: JSON.stringify(payload)
                 });
-
-                if(!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                // Intentar leer respuesta (puede ser JSON o texto)
-                let responseData;
-                const contentType = response.headers.get('content-type');
-                if(contentType && contentType.includes('application/json')) {
-                    responseData = await response.json();
-                } else {
-                    responseData = await response.text();
-                }
-
-                console.log('Respuesta de Google Sheets:', responseData);
                 
-                showCustomModal('success', '✅ Sincronización Exitosa', 
-                    `Se enviaron ${flights.length} registros a Google Sheets correctamente.\n\n` +
-                    `Datos recibidos por el servidor: ${typeof responseData === 'object' ? JSON.stringify(responseData) : responseData}`
+                showCustomModal('success', '✅ Datos Enviados', 
+                    `Se ha despachado la sincronización de ${flights.length} registros hacia Google Sheets.\n\n` +
+                    `Nota: Por seguridad del navegador (CORS), no es posible leer el mensaje de respuesta de Google, pero la transmisión ha sido iniciada. Verifica tu hoja de cálculo.`
                 );
 
             } catch(error) {
